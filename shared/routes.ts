@@ -57,6 +57,14 @@ export const api = {
         200: z.custom<typeof pets.$inferSelect>(),
         404: errorSchemas.notFound,
       },
+    },
+    bloodTest: {
+      method: 'POST' as const,
+      path: '/api/pets/:id/blood-test',
+      responses: {
+        200: z.custom<typeof pets.$inferSelect>(),
+        404: errorSchemas.notFound,
+      },
     }
   },
   foods: {

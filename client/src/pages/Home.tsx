@@ -47,7 +47,7 @@ export default function Home() {
             <span className="text-6xl grayscale opacity-30">🐾</span>
           </div>
           <div>
-            <h2 className="text-3xl font-display font-bold mb-2">Welcome, {user.firstName}!</h2>
+            <h2 className="text-3xl font-display font-bold mb-2">Welcome, {user.firstName || 'Friend'}!</h2>
             <p className="text-muted-foreground mb-8">Ready to adopt your new best friend?</p>
             <CreatePetDialog />
           </div>

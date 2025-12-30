@@ -88,23 +88,10 @@ export async function registerRoutes(
       switch (input.type) {
         case "feed":
           if (input.foodId) {
-            // Simplified logic: Food increases hunger (satiety) and blood sugar
-            // Hunger: 0 is full, 100 is starving? Or 100 is full? 
-            // Schema: 100 is default. Let's assume 100 is FULL energy/satiety.
-            // Wait, schema comment said "100 is very hungry" for hunger?
-            // "hunger: integer... default(50)"
-            // Let's assume standard game logic: Hunger bar decreases over time, eating refills it (increases value? or decreases "hunger"?)
-            // Usually "Hunger" variable = how hungry you are. So eating DECREASES it.
-            // But "Energy" = how much energy. Eating INCREASES it.
-            // Let's treat "hunger" as "satiety" for simplicity in the UI (0=empty, 100=full). 
-            // Actually, let's look at schema: "hunger... default(50)".
-            // Let's assume: 0 = Starving, 100 = Full.
-            
-            // Fetch food
             const foods = await storage.getFoods();
             const food = foods.find(f => f.id === input.foodId);
             if (food) {
-              updates.hunger = Math.min(100, pet.hunger + 20); // Eat fills up
+              updates.hunger = Math.min(100, pet.hunger + 20);
               updates.bloodSugar = pet.bloodSugar + food.carbImpact;
               updates.health = Math.min(100, Math.max(0, pet.health + food.healthValue));
               updates.lastFed = new Date();
@@ -113,8 +100,6 @@ export async function registerRoutes(
           break;
         case "insulin":
           if (input.insulinUnits) {
-            // Insulin decreases blood sugar
-            // 1 unit = -10 mg/dL (simplified)
             updates.bloodSugar = Math.max(0, pet.bloodSugar - (input.insulinUnits * 10));
             updates.insulinLevel = pet.insulinLevel + input.insulinUnits;
             updates.lastInsulin = new Date();
@@ -130,7 +115,19 @@ export async function registerRoutes(
         case "play":
           updates.energy = Math.max(0, pet.energy - 10);
           updates.mood = "happy";
-          updates.bloodSugar = Math.max(0, pet.bloodSugar - 5); // Exercise lowers sugar
+          updates.bloodSugar = Math.max(0, pet.bloodSugar - 5);
+          
+          // Randomly trigger a scenario when playing
+          if (Math.random() > 0.7 && !pet.activeScenario) {
+            const scenarios = [
+              { id: "sport", desc: "Your buddy just finished a big soccer game! Exercise can make blood sugar go down. Let's check!" },
+              { id: "party", desc: "Oh no! Your buddy ate a hidden cupcake at a party. Sugary treats make blood sugar go up! Check it now!" },
+              { id: "nap", desc: "A long nap can sometimes change how our body uses energy. Time for a quick check-in!" }
+            ];
+            const sc = scenarios[Math.floor(Math.random() * scenarios.length)];
+            updates.activeScenario = sc.id;
+            updates.scenarioDescription = sc.desc;
+          }
           break;
       }
 
@@ -157,6 +154,35 @@ export async function registerRoutes(
     }
 
     const updatedPet = await storage.updatePet(petId, { bloodSugar: value });
+    res.json(updatedPet);
+  });
+
+  app.post(api.pets.bloodTest.path, async (req, res) => {
+    const petId = Number(req.params.id);
+    const pet = await storage.getPet(petId);
+    if (!pet) {
+      res.status(404).json({ message: "Pet not found" });
+      return;
+    }
+
+    const updates: any = {};
+    // Solving diabetes scenarios or just a regular check
+    // If there's an active scenario, completing it gives more XP
+    const xpGain = pet.activeScenario ? 50 : 10;
+    let newExp = pet.experience + xpGain;
+    let newLevel = pet.level;
+
+    if (newExp >= 100) {
+      newLevel += 1;
+      newExp -= 100;
+    }
+
+    updates.experience = newExp;
+    updates.level = newLevel;
+    updates.activeScenario = null; // Clear scenario after test
+    updates.scenarioDescription = null;
+
+    const updatedPet = await storage.updatePet(petId, updates);
     res.json(updatedPet);
   });
 

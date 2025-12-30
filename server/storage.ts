@@ -1,6 +1,13 @@
 import { db } from "./db";
-import { pets, foods, users, type Pet, type InsertPet, type Food, type User, type InsertUser } from "@shared/schema";
+import { pets, foods, users, type Pet, type InsertPet, type Food, type User } from "@shared/schema";
 import { eq } from "drizzle-orm";
+
+type UpsertUser = {
+  id: string;
+  email: string | null;
+  firstName: string | null;
+  lastName: string | null;
+};
 
 export interface IStorage {
   getUser(id: string): Promise<User | undefined>;
@@ -56,6 +63,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createFood(food: Food): Promise<Food> {
+    // @ts-ignore
     const [newFood] = await db.insert(foods).values(food).returning();
     return newFood;
   }

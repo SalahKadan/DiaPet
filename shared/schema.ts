@@ -9,16 +9,20 @@ export * from "./models/chat";
 
 export const pets = pgTable("pets", {
   id: serial("id").primaryKey(),
-  userId: varchar("user_id").notNull().references(() => users.id), // maps to users.id which is varchar in auth model
+  userId: varchar("user_id").notNull().references(() => users.id),
   name: text("name").notNull(),
   type: text("type").notNull().default("cat"),
   health: integer("health").notNull().default(100),
-  hunger: integer("hunger").notNull().default(50), // 0-100, 100 is very hungry
-  energy: integer("energy").notNull().default(100), // 0-100, 100 is full energy
-  bloodSugar: integer("blood_sugar").notNull().default(100), // mg/dL
+  hunger: integer("hunger").notNull().default(50),
+  energy: integer("energy").notNull().default(100),
+  bloodSugar: integer("blood_sugar").notNull().default(100),
   insulinLevel: integer("insulin_level").notNull().default(0),
   mood: text("mood").notNull().default("happy"),
   isAsleep: boolean("is_asleep").notNull().default(false),
+  level: integer("level").notNull().default(1),
+  experience: integer("experience").notNull().default(0),
+  activeScenario: text("active_scenario"),
+  scenarioDescription: text("scenario_description"),
   lastFed: timestamp("last_fed").defaultNow(),
   lastInsulin: timestamp("last_insulin").defaultNow(),
   createdAt: timestamp("created_at").defaultNow(),
