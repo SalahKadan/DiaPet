@@ -8,6 +8,7 @@ interface StatusIndicatorProps {
   icon?: React.ReactNode;
   colorClass?: string;
   type?: "normal" | "bloodSugar";
+  className?: string;
 }
 
 export function StatusIndicator({
@@ -16,7 +17,8 @@ export function StatusIndicator({
   max = 100,
   icon,
   colorClass = "bg-primary",
-  type = "normal"
+  type = "normal",
+  className
 }: StatusIndicatorProps) {
   
   // Calculate percentage for width
@@ -32,7 +34,7 @@ export function StatusIndicator({
   }
 
   return (
-    <div className="w-full space-y-1">
+    <div className={cn("w-full space-y-1", className)}>
       <div className="flex justify-between items-center text-sm font-bold text-gray-600 px-1">
         <span className="flex items-center gap-2">
           {icon}

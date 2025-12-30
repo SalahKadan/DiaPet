@@ -1,15 +1,17 @@
 import { motion } from "framer-motion";
 import { Pet } from "@shared/schema";
 import { HeartPulse, ArrowDownAZ } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 // In a real app, these would be proper SVG illustrations or images
 // For now, we'll use emojis or simple shapes composed beautifully
 
 interface PetAvatarProps {
   pet: Pet;
+  className?: string;
 }
 
-export function PetAvatar({ pet }: PetAvatarProps) {
+export function PetAvatar({ pet, className }: PetAvatarProps) {
   // Determine mood-based expression
   let expression = "😊";
   if (pet.isAsleep) expression = "😴";
@@ -38,7 +40,7 @@ export function PetAvatar({ pet }: PetAvatarProps) {
   };
 
   return (
-    <div className="relative w-64 h-64 mx-auto flex items-center justify-center">
+    <div className={cn("relative w-64 h-64 mx-auto flex items-center justify-center", className)}>
       {/* Background Glow */}
       <div className="absolute inset-0 bg-primary/20 blur-3xl rounded-full scale-75 animate-pulse" />
 
