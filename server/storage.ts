@@ -3,13 +3,13 @@ import { pets, foods, users, type Pet, type InsertPet, type Food, type User, typ
 import { eq } from "drizzle-orm";
 
 export interface IStorage {
-  getUser(id: number): Promise<User | undefined>;
+  getUser(id: string): Promise<User | undefined>;
   getUserByUsername(username: string): Promise<User | undefined>;
-  createUser(user: InsertUser): Promise<User>;
+  createUser(user: UpsertUser): Promise<User>;
 
   getPet(id: number): Promise<Pet | undefined>;
-  getPetsByUserId(userId: number): Promise<Pet[]>;
-  createPet(pet: InsertPet & { userId: number }): Promise<Pet>;
+  getPetsByUserId(userId: string): Promise<Pet[]>;
+  createPet(pet: InsertPet & { userId: string }): Promise<Pet>;
   updatePet(id: number, updates: Partial<Pet>): Promise<Pet>;
   
   getFoods(): Promise<Food[]>;
@@ -17,17 +17,17 @@ export interface IStorage {
 }
 
 export class DatabaseStorage implements IStorage {
-  async getUser(id: number): Promise<User | undefined> {
+  async getUser(id: string): Promise<User | undefined> {
     const [user] = await db.select().from(users).where(eq(users.id, id));
     return user;
   }
 
   async getUserByUsername(username: string): Promise<User | undefined> {
-    const [user] = await db.select().from(users).where(eq(users.username, username));
+    const [user] = await db.select().from(users).where(eq(users.email, username));
     return user;
   }
 
-  async createUser(insertUser: InsertUser): Promise<User> {
+  async createUser(insertUser: UpsertUser): Promise<User> {
     const [user] = await db.insert(users).values(insertUser).returning();
     return user;
   }
@@ -37,11 +37,11 @@ export class DatabaseStorage implements IStorage {
     return pet;
   }
 
-  async getPetsByUserId(userId: number): Promise<Pet[]> {
+  async getPetsByUserId(userId: string): Promise<Pet[]> {
     return await db.select().from(pets).where(eq(pets.userId, userId));
   }
 
-  async createPet(pet: InsertPet & { userId: number }): Promise<Pet> {
+  async createPet(pet: InsertPet & { userId: string }): Promise<Pet> {
     const [newPet] = await db.insert(pets).values(pet).returning();
     return newPet;
   }

@@ -37,14 +37,12 @@ export async function registerRoutes(
   // Pet Routes
   app.get(api.pets.get.path, async (req, res) => {
     // For MVP, if no auth, just return a demo pet or create one for 'demo' user
-    // In real app, use req.user.id
-    // Mock user for now if not logged in
-    let userId = 1; 
+    let userId = "demo_id"; 
     
     // Ensure demo user exists
     let user = await storage.getUser(userId);
     if (!user) {
-      user = await storage.createUser({ username: "demo_kid" });
+      user = await storage.createUser({ id: userId, email: "demo@example.com", firstName: "Demo", lastName: "Kid" });
     }
 
     let pets = await storage.getPetsByUserId(userId);
@@ -62,8 +60,8 @@ export async function registerRoutes(
   app.post(api.pets.create.path, async (req, res) => {
     try {
       const input = api.pets.create.input.parse(req.body);
-      // Mock user ID 1
-      const pet = await storage.createPet({ ...input, userId: 1 });
+      // Mock user ID
+      const pet = await storage.createPet({ ...input, userId: "demo_id" });
       res.status(201).json(pet);
     } catch (err) {
       if (err instanceof z.ZodError) {

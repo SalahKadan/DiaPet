@@ -1,18 +1,15 @@
-import { pgTable, text, serial, integer, boolean, timestamp } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, integer, boolean, timestamp, varchar } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
+import { sql } from "drizzle-orm";
+import { users } from "./models/auth";
 
 export * from "./models/auth";
 export * from "./models/chat";
 
-export const users = pgTable("users", {
-  id: serial("id").primaryKey(),
-  username: text("username").notNull().unique(),
-});
-
 export const pets = pgTable("pets", {
   id: serial("id").primaryKey(),
-  userId: integer("user_id").notNull(), // maps to users.id
+  userId: varchar("user_id").notNull().references(() => users.id), // maps to users.id which is varchar in auth model
   name: text("name").notNull(),
   type: text("type").notNull().default("cat"),
   health: integer("health").notNull().default(100),
@@ -35,7 +32,6 @@ export const foods = pgTable("foods", {
   image: text("image"), // Icon name or url
 });
 
-export const insertUserSchema = createInsertSchema(users);
 export const insertPetSchema = createInsertSchema(pets).omit({ 
   id: true, 
   userId: true,
@@ -52,8 +48,6 @@ export const insertPetSchema = createInsertSchema(pets).omit({
 });
 export const insertFoodSchema = createInsertSchema(foods).omit({ id: true });
 
-export type User = typeof users.$inferSelect;
-export type InsertUser = z.infer<typeof insertUserSchema>;
 export type Pet = typeof pets.$inferSelect;
 export type InsertPet = z.infer<typeof insertPetSchema>;
 export type Food = typeof foods.$inferSelect;
