@@ -83,8 +83,8 @@ export default {
         },
       },
       fontFamily: {
-        display: ['"Architects Daughter"', '"Comic Sans MS"', "cursive"],
-        body: ['"DM Sans"', "sans-serif"],
+        display: ['"Lexend"', '"Fredoka"', "sans-serif"],
+        body: ['"Lexend"', "sans-serif"],
         sans: ["var(--font-sans)"],
         serif: ["var(--font-serif)"],
         mono: ["var(--font-mono)"],

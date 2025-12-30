@@ -51,184 +51,179 @@ export function PetDashboard({ pet }: PetDashboardProps) {
   };
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-      
-      {/* LEFT COLUMN: Pet Avatar & Quick Actions */}
-      <div className="space-y-6">
-        <Card className="p-8 glass-card border-none rounded-[2rem] text-center relative overflow-hidden">
-          <PetAvatar pet={pet} />
+    <div className="fixed inset-0 flex items-center justify-center bg-background overflow-hidden p-4">
+      {/* Mobile-style Container */}
+      <div className="relative w-full max-w-[450px] aspect-[9/19] bg-card rounded-[3rem] shadow-2xl overflow-hidden flex flex-col border border-white/5">
+        
+        {/* Top Status Bars - Left/Right Style */}
+        <div className="absolute top-8 left-4 right-4 z-20 grid grid-cols-2 gap-4 h-32">
+          {/* Left Side: Health & Energy */}
+          <div className="flex flex-col gap-2">
+            <StatusIndicator 
+              label="HP" 
+              value={pet.health} 
+              icon={<Heart className="w-3 h-3 text-pink-500" />} 
+              colorClass="bg-pink-500" 
+              className="h-8"
+            />
+            <StatusIndicator 
+              label="NRG" 
+              value={pet.energy} 
+              icon={<Zap className="w-3 h-3 text-yellow-500" />} 
+              colorClass="bg-yellow-500" 
+              className="h-8"
+            />
+          </div>
           
-          <div className="mt-8 grid grid-cols-2 gap-3">
+          {/* Right Side: Hunger & BS */}
+          <div className="flex flex-col gap-2">
+            <StatusIndicator 
+              label="FOOD" 
+              value={pet.hunger} 
+              icon={<Utensils className="w-3 h-3 text-orange-500" />} 
+              colorClass="bg-orange-500" 
+              className="h-8"
+            />
+            <StatusIndicator 
+              label="BS" 
+              value={pet.bloodSugar} 
+              max={300}
+              icon={<Activity className="w-3 h-3 text-red-500" />} 
+              type="bloodSugar"
+              className="h-8"
+            />
+          </div>
+        </div>
+
+        {/* Center: Pet Avatar */}
+        <div className="flex-1 flex items-center justify-center relative bg-gradient-to-b from-primary/5 to-transparent">
+          <motion.div
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            className="w-full px-8"
+          >
+            <PetAvatar pet={pet} className="w-full max-w-[280px] mx-auto drop-shadow-[0_0_50px_rgba(59,130,246,0.3)]" />
+          </motion.div>
+          
+          {/* Floating Actions */}
+          <div className="absolute bottom-32 left-0 right-0 px-6 flex justify-between items-center">
             <Button 
-              size="lg"
-              className="rounded-2xl h-14 text-lg bg-orange-100 hover:bg-orange-200 text-orange-700 border border-orange-200 shadow-sm"
+              size="icon"
+              variant="secondary"
+              className="w-14 h-14 rounded-2xl shadow-lg hover-elevate"
               onClick={() => handleAction(pet.isAsleep ? 'wake' : 'sleep')}
               disabled={actionPending}
             >
-              {pet.isAsleep ? <Sun className="mr-2" /> : <Moon className="mr-2" />}
-              {pet.isAsleep ? "Wake Up" : "Sleep"}
+              {pet.isAsleep ? <Sun className="w-6 h-6" /> : <Moon className="w-6 h-6" />}
             </Button>
-            
+
             <Dialog>
               <DialogTrigger asChild>
                 <Button 
-                  size="lg" 
-                  className="rounded-2xl h-14 text-lg bg-green-100 hover:bg-green-200 text-green-700 border border-green-200 shadow-sm"
+                  size="icon"
+                  variant="secondary"
+                  className="w-14 h-14 rounded-2xl shadow-lg hover-elevate"
                   disabled={pet.isAsleep || actionPending}
                 >
-                  <Utensils className="mr-2" /> Feed
+                  <Utensils className="w-6 h-6" />
                 </Button>
               </DialogTrigger>
-              <DialogContent className="max-w-2xl rounded-3xl">
-                <h2 className="text-2xl font-display text-center mb-4">Pick a Healthy Snack!</h2>
+              <DialogContent className="max-w-[350px] rounded-3xl bg-card/95 backdrop-blur-xl border-white/10">
+                <h2 className="text-xl font-display text-center mb-4">Pick a Snack!</h2>
                 <FoodSelector onSelect={(foodId) => handleAction('feed', { foodId })} disabled={actionPending} />
               </DialogContent>
             </Dialog>
-          </div>
-        </Card>
 
-        {/* AI Chat Bubble */}
-        <Card className="glass-card border-none rounded-[2rem] p-6 relative">
-          <div className="absolute -top-3 -right-3 rotate-12 bg-yellow-400 text-white px-3 py-1 rounded-full font-bold shadow-md text-xs">
-            BETA
-          </div>
-          <h3 className="text-xl font-bold flex items-center gap-2 mb-4">
-            <MessageCircle className="w-6 h-6 text-primary" />
-            Ask {pet.name}
-          </h3>
-          
-          <div className="h-48 overflow-y-auto space-y-3 mb-4 pr-2 scrollbar-thin scrollbar-thumb-gray-200">
-             {chatHistory.length === 0 && (
-               <p className="text-gray-400 text-center italic text-sm mt-10">
-                 "Ask me about healthy food or how I'm feeling!"
-               </p>
-             )}
-             {chatHistory.map((msg, i) => (
-               <div key={i} className={`p-3 rounded-2xl text-sm ${msg.role === 'user' ? 'bg-primary/10 ml-8 text-right' : 'bg-gray-100 mr-8'}`}>
-                 {msg.text}
-               </div>
-             ))}
-             {chatPending && <div className="text-xs text-gray-400 animate-pulse">Thinking...</div>}
-          </div>
-
-          <form onSubmit={handleChat} className="flex gap-2">
-            <Input 
-              value={chatInput} 
-              onChange={e => setChatInput(e.target.value)} 
-              placeholder="Type a message..."
-              className="rounded-xl border-slate-200 focus-visible:ring-primary"
-            />
-            <Button type="submit" size="icon" className="rounded-xl shrink-0" disabled={chatPending}>
-              <MessageCircle className="w-5 h-5" />
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button 
+                  size="icon"
+                  variant="secondary"
+                  className="w-14 h-14 rounded-2xl shadow-lg hover-elevate"
+                  disabled={pet.isAsleep || actionPending}
+                >
+                  <Activity className="w-6 h-6" />
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="max-w-[350px] rounded-3xl bg-card/95 backdrop-blur-xl border-white/10">
+                <h2 className="text-xl font-display text-center mb-4">Insulin Pump</h2>
+                <InsulinControl 
+                  currentBloodSugar={pet.bloodSugar} 
+                  isPending={actionPending}
+                  onAdminister={(units) => handleAction('insulin', { insulinUnits: units })}
+                />
+              </DialogContent>
+            </Dialog>
+            
+            <Button 
+              size="icon"
+              variant="secondary"
+              className="w-14 h-14 rounded-2xl shadow-lg hover-elevate"
+              onClick={() => setChatOpen(!chatOpen)}
+            >
+              <MessageCircle className="w-6 h-6" />
             </Button>
-          </form>
-        </Card>
-      </div>
-
-      {/* CENTER COLUMN: Status & Vitals */}
-      <div className="lg:col-span-2 space-y-6">
-        
-        {/* Main Status Bars */}
-        <Card className="p-6 bg-white rounded-[2rem] shadow-sm border border-slate-100">
-          <h3 className="text-lg font-bold text-gray-400 mb-6 uppercase tracking-wider text-xs">Vitals</h3>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-6">
-            <StatusIndicator 
-              label="Health" 
-              value={pet.health} 
-              icon={<Heart className="w-4 h-4 text-pink-500" />} 
-              colorClass="bg-pink-500" 
-            />
-            <StatusIndicator 
-              label="Energy" 
-              value={pet.energy} 
-              icon={<Zap className="w-4 h-4 text-yellow-500" />} 
-              colorClass="bg-yellow-500" 
-            />
-            <StatusIndicator 
-              label="Hunger" 
-              value={pet.hunger} 
-              icon={<Utensils className="w-4 h-4 text-orange-500" />} 
-              colorClass="bg-orange-500" 
-            />
-            <StatusIndicator 
-              label="Blood Sugar" 
-              value={pet.bloodSugar} 
-              max={300}
-              icon={<Activity className="w-4 h-4 text-red-500" />} 
-              type="bloodSugar"
-            />
           </div>
-        </Card>
-
-        {/* Diabetes Management Zone */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          
-          {/* Insulin Management */}
-          <Card className="p-6 rounded-[2rem] border border-blue-100 shadow-sm overflow-hidden relative">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-blue-50 rounded-bl-[100%] -z-10" />
-            <h3 className="font-display text-2xl text-blue-900 mb-4">Insulin Pump</h3>
-            <InsulinControl 
-              currentBloodSugar={pet.bloodSugar} 
-              isPending={actionPending}
-              onAdminister={(units) => handleAction('insulin', { insulinUnits: units })}
-            />
-          </Card>
-
-          {/* Sensor Simulation (Monitoring Mode) */}
-          <Card className="p-6 rounded-[2rem] border border-slate-100 shadow-sm bg-slate-50">
-            <h3 className="font-display text-2xl text-slate-700 mb-2 flex items-center gap-2">
-              <Stethoscope className="w-6 h-6" />
-              Sensor Monitor
-            </h3>
-            <p className="text-sm text-gray-500 mb-6">
-              Simulate a continuous glucose monitor (CGM) reading.
-            </p>
-
-            <div className="space-y-8 px-2">
-              <div className="text-center">
-                <span className={`text-4xl font-bold ${monitorValue > 180 || monitorValue < 70 ? 'text-red-500' : 'text-green-600'}`}>
-                  {monitorValue}
-                </span>
-                <span className="text-sm text-gray-400 ml-1">mg/dL</span>
-              </div>
-              
-              <Slider 
-                value={[monitorValue]} 
-                onValueChange={(val) => setMonitorValue(val[0])}
-                min={40}
-                max={400}
-                step={1}
-                className="py-2"
-              />
-
-              <Button 
-                onClick={handleMonitorUpdate}
-                disabled={sugarPending}
-                className="w-full rounded-xl"
-                variant="outline"
-              >
-                Update Sensor Reading
-              </Button>
-            </div>
-          </Card>
         </div>
 
-        {/* Mini Games Access */}
-        <Card className="p-6 rounded-[2rem] bg-gradient-to-r from-violet-500 to-fuchsia-500 text-white shadow-lg relative overflow-hidden group cursor-pointer hover:shadow-xl transition-all">
-          <div className="absolute inset-0 bg-black/10 opacity-0 group-hover:opacity-100 transition-opacity" />
-          <div className="flex items-center justify-between relative z-10">
-            <div>
-              <h3 className="font-display text-3xl mb-1">Mini Games</h3>
-              <p className="opacity-90">Play to learn about healthy habits!</p>
-            </div>
-            <Gamepad2 className="w-12 h-12 opacity-80" />
+        {/* Bottom Bar: Quick Nav / Additional Info */}
+        <div className="h-20 bg-muted/30 backdrop-blur-md flex items-center justify-around border-t border-white/5">
+          <Button variant="ghost" size="icon" className="w-12 h-12 text-muted-foreground hover:text-primary">
+            <Gamepad2 className="w-6 h-6" />
+          </Button>
+          <Button variant="ghost" size="icon" className="w-12 h-12 text-muted-foreground hover:text-primary">
+            <Stethoscope className="w-6 h-6" />
+          </Button>
+          <div className="w-12 h-12 bg-primary/20 rounded-xl flex items-center justify-center text-primary font-bold">
+            LV1
           </div>
-          {/* Coming soon overlay */}
-          <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity backdrop-blur-[2px]">
-            <span className="font-bold text-xl tracking-widest">COMING SOON</span>
-          </div>
-        </Card>
+          <Button variant="ghost" size="icon" className="w-12 h-12 text-muted-foreground hover:text-primary">
+             <Activity className="w-6 h-6" />
+          </Button>
+          <Button variant="ghost" size="icon" className="w-12 h-12 text-muted-foreground hover:text-primary">
+             <Zap className="w-6 h-6" />
+          </Button>
+        </div>
 
+        {/* Overlays: Chat */}
+        <AnimatePresence>
+          {chatOpen && (
+            <motion.div 
+              initial={{ y: "100%" }}
+              animate={{ y: 0 }}
+              exit={{ y: "100%" }}
+              className="absolute inset-0 z-50 bg-card flex flex-col pt-12"
+            >
+              <div className="px-6 flex justify-between items-center mb-6">
+                <h3 className="text-2xl font-display font-bold">Ask {pet.name}</h3>
+                <Button variant="ghost" size="icon" onClick={() => setChatOpen(false)}>
+                  <Zap className="rotate-45" />
+                </Button>
+              </div>
+              
+              <div className="flex-1 overflow-y-auto px-6 space-y-4">
+                {chatHistory.map((msg, i) => (
+                  <div key={i} className={`p-4 rounded-[1.5rem] text-sm max-w-[80%] ${msg.role === 'user' ? 'bg-primary text-primary-foreground ml-auto' : 'bg-muted'}`}>
+                    {msg.text}
+                  </div>
+                ))}
+                {chatPending && <div className="text-xs text-muted-foreground animate-pulse">Thinking...</div>}
+              </div>
+
+              <form onSubmit={handleChat} className="p-6 bg-muted/30 flex gap-2">
+                <Input 
+                  value={chatInput} 
+                  onChange={e => setChatInput(e.target.value)} 
+                  placeholder="Say something..."
+                  className="rounded-2xl h-14 bg-card border-none"
+                />
+                <Button type="submit" size="icon" className="w-14 h-14 rounded-2xl shrink-0" disabled={chatPending}>
+                  <MessageCircle className="w-6 h-6" />
+                </Button>
+              </form>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </div>
   );
