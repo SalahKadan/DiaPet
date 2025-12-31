@@ -22,14 +22,21 @@ export function PetDashboard({ pet }: PetDashboardProps) {
   const { mutate: updateSugar, isPending: sugarPending } = useUpdateBloodSugar();
   const { mutate: sendChat, isPending: chatPending } = useChat();
 
-  const [chatOpen, setChatOpen] = useState(false);
-  const [bloodTestOpen, setBloodTestOpen] = useState(false);
-  const [foodMenuOpen, setFoodMenuOpen] = useState(false);
-  const [insulinMenuOpen, setInsulinMenuOpen] = useState(false);
-  const [chatInput, setChatInput] = useState("");
-  const [chatHistory, setChatHistory] = useState<{role: 'user'|'pet', text: string}[]>([]);
+  const [namingOpen, setNamingOpen] = useState(!pet.name || pet.name === "Diabeats");
+  const [petName, setPetName] = useState("");
 
-  const bloodTestMutation = useMutation({
+  const nameMutation = useMutation({
+    mutationFn: async (name: string) => {
+      const res = await apiRequest("PATCH", `/api/pets/${pet.id}`, { name });
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/pets"] });
+      setNamingOpen(false);
+    }
+  });
+
+  const handleAction = (type: 'feed' | 'insulin' | 'sleep' | 'wake' | 'play', extra?: any) => {
     mutationFn: async () => {
       const res = await apiRequest("POST", `/api/pets/${pet.id}/blood-test`);
       return res.json();
@@ -76,6 +83,32 @@ export function PetDashboard({ pet }: PetDashboardProps) {
       <div className="relative w-full max-w-[450px] aspect-[9/19] bg-card rounded-[3rem] shadow-2xl overflow-hidden flex flex-col border border-white/5">
         
         <AnimatePresence>
+          {namingOpen && (
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="absolute inset-0 z-[100] bg-background/90 backdrop-blur-xl flex flex-col items-center justify-center p-8">
+              <div className="w-full max-w-sm space-y-6">
+                <div className="text-center">
+                  <h2 className="text-4xl font-display font-bold mb-2">Welcome!</h2>
+                  <p className="text-muted-foreground">What should we name your new friend?</p>
+                </div>
+                <div className="space-y-4">
+                  <Input 
+                    value={petName} 
+                    onChange={(e) => setPetName(e.target.value)}
+                    placeholder="Enter a name..." 
+                    className="h-16 text-2xl text-center rounded-2xl bg-card border-2 border-primary/20 focus:border-primary"
+                  />
+                  <Button 
+                    className="w-full h-16 text-xl rounded-2xl font-bold"
+                    onClick={() => nameMutation.mutate(petName)}
+                    disabled={!petName.trim() || nameMutation.isPending}
+                  >
+                    {nameMutation.isPending ? "Naming..." : "Let's Play!"}
+                  </Button>
+                </div>
+              </div>
+            </motion.div>
+          )}
+
           {pet.activeScenario && (
             <motion.div 
               initial={{ y: -100 }}
