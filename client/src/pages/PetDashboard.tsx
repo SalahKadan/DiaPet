@@ -24,6 +24,8 @@ export function PetDashboard({ pet }: PetDashboardProps) {
 
   const [chatOpen, setChatOpen] = useState(false);
   const [bloodTestOpen, setBloodTestOpen] = useState(false);
+  const [foodMenuOpen, setFoodMenuOpen] = useState(false);
+  const [insulinMenuOpen, setInsulinMenuOpen] = useState(false);
   const [chatInput, setChatInput] = useState("");
   const [chatHistory, setChatHistory] = useState<{role: 'user'|'pet', text: string}[]>([]);
 
@@ -39,8 +41,20 @@ export function PetDashboard({ pet }: PetDashboardProps) {
   });
 
   const handleAction = (type: 'feed' | 'insulin' | 'sleep' | 'wake' | 'play', extra?: any) => {
-    performAction({ id: pet.id, type, ...extra });
+    handleActionMutation.mutate({ id: pet.id, type, ...extra });
   };
+
+  const handleActionMutation = useMutation({
+    mutationFn: async (data: any) => {
+      const res = await apiRequest("POST", `/api/pets/${data.id}/action`, data);
+      return res.json();
+    },
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ["/api/pets"] });
+      if (variables.type === 'feed') setFoodMenuOpen(false);
+      if (variables.type === 'insulin') setInsulinMenuOpen(false);
+    }
+  });
 
   const handleChat = (e: React.FormEvent) => {
     e.preventDefault();
@@ -75,55 +89,55 @@ export function PetDashboard({ pet }: PetDashboardProps) {
           )}
         </AnimatePresence>
 
-        <div className="absolute top-12 left-4 right-4 z-20 grid grid-cols-2 gap-4 h-32">
-          <div className="flex flex-col gap-2">
+        <div className="pt-12 px-6 flex flex-col gap-4 z-20">
+          <div className="grid grid-cols-2 gap-4">
             <StatusIndicator label="HP" value={pet.health} icon={<Heart className="w-3 h-3 text-pink-500" />} colorClass="bg-pink-500" className="h-8" />
-            <StatusIndicator label="NRG" value={pet.energy} icon={<Zap className="w-3 h-3 text-yellow-500" />} colorClass="bg-yellow-500" className="h-8" />
-          </div>
-          <div className="flex flex-col gap-2">
-            <StatusIndicator label="FOOD" value={pet.hunger} icon={<Utensils className="w-3 h-3 text-orange-500" />} colorClass="bg-orange-500" className="h-8" />
             <StatusIndicator label="BS" value={pet.bloodSugar} max={300} icon={<Activity className="w-3 h-3 text-red-500" />} type="bloodSugar" className="h-8" />
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <StatusIndicator label="FOOD" value={pet.hunger} icon={<Utensils className="w-3 h-3 text-orange-500" />} colorClass="bg-orange-500" className="h-8" />
+            <StatusIndicator label="NRG" value={pet.energy} icon={<Zap className="w-3 h-3 text-yellow-500" />} colorClass="bg-yellow-500" className="h-8" />
           </div>
         </div>
 
-        <div className="flex-1 flex flex-col items-center justify-center relative bg-gradient-to-b from-primary/5 to-transparent">
+        <div className="flex-1 flex flex-col items-center justify-center relative bg-gradient-to-b from-primary/5 to-transparent pt-8">
           <motion.div initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="w-full px-8">
             <PetAvatar pet={pet} className="w-full max-w-[280px] mx-auto drop-shadow-[0_0_50px_rgba(59,130,246,0.3)]" />
           </motion.div>
           
-          <div className="mt-4 text-center px-6">
-            <h2 className="text-2xl font-display font-bold text-primary mb-1">{pet.name}</h2>
-            <div className="bg-muted/50 backdrop-blur-sm rounded-2xl p-3 border border-white/5 min-h-[60px] flex items-center justify-center">
-              <p className="text-sm italic text-muted-foreground">
+          <div className="mt-8 text-center px-6">
+            <h2 className="text-2xl font-display font-bold text-primary mb-2">{pet.name}</h2>
+            <div className="bg-muted/50 backdrop-blur-sm rounded-2xl p-4 border border-white/5 min-h-[80px] flex items-center justify-center shadow-inner">
+              <p className="text-sm italic text-muted-foreground leading-relaxed">
                 {pet.activeScenario ? pet.scenarioDescription : "I'm feeling good! Ready to play?"}
               </p>
             </div>
           </div>
 
-          <div className="mt-6 px-6 flex justify-around items-center w-full max-w-[320px]">
-            <Button size="icon" variant="default" className="w-14 h-14 rounded-2xl shadow-lg bg-blue-500 hover:bg-blue-600 hover-elevate" onClick={() => handleAction(pet.isAsleep ? 'wake' : 'sleep')} disabled={actionPending}>
+          <div className="mt-8 px-6 flex justify-around items-center w-full max-w-[320px] gap-4">
+            <Button size="icon" variant="default" className="w-14 h-14 rounded-2xl shadow-lg bg-blue-500 hover:bg-blue-600 hover-elevate" onClick={() => handleAction(pet.isAsleep ? 'wake' : 'sleep')} disabled={handleActionMutation.isPending}>
               {pet.isAsleep ? <Sun className="w-6 h-6" /> : <Moon className="w-6 h-6" />}
             </Button>
-            <Dialog>
+            <Dialog open={foodMenuOpen} onOpenChange={setFoodMenuOpen}>
               <DialogTrigger asChild>
-                <Button size="icon" variant="default" className="w-14 h-14 rounded-2xl shadow-lg bg-blue-500 hover:bg-blue-600 hover-elevate" disabled={pet.isAsleep || actionPending}>
+                <Button size="icon" variant="default" className="w-14 h-14 rounded-2xl shadow-lg bg-blue-500 hover:bg-blue-600 hover-elevate" disabled={pet.isAsleep || handleActionMutation.isPending}>
                   <Utensils className="w-6 h-6" />
                 </Button>
               </DialogTrigger>
               <DialogContent className="max-w-[350px] rounded-3xl bg-card/95 backdrop-blur-xl border-white/10">
                 <h2 className="text-xl font-display text-center mb-4">Pick a Snack!</h2>
-                <FoodSelector onSelect={(foodId) => handleAction('feed', { foodId })} disabled={actionPending} />
+                <FoodSelector onSelect={(foodId) => handleAction('feed', { foodId })} disabled={handleActionMutation.isPending} />
               </DialogContent>
             </Dialog>
-            <Dialog>
+            <Dialog open={insulinMenuOpen} onOpenChange={setInsulinMenuOpen}>
               <DialogTrigger asChild>
-                <Button size="icon" variant="default" className="w-14 h-14 rounded-2xl shadow-lg bg-blue-500 hover:bg-blue-600 hover-elevate" disabled={pet.isAsleep || actionPending}>
+                <Button size="icon" variant="default" className="w-14 h-14 rounded-2xl shadow-lg bg-blue-500 hover:bg-blue-600 hover-elevate" disabled={pet.isAsleep || handleActionMutation.isPending}>
                   <Activity className="w-6 h-6" />
                 </Button>
               </DialogTrigger>
               <DialogContent className="max-w-[350px] rounded-3xl bg-card/95 backdrop-blur-xl border-white/10">
                 <h2 className="text-xl font-display text-center mb-4">Insulin Pump</h2>
-                <InsulinControl currentBloodSugar={pet.bloodSugar} isPending={actionPending} onAdminister={(units) => handleAction('insulin', { insulinUnits: units })} />
+                <InsulinControl currentBloodSugar={pet.bloodSugar} isPending={handleActionMutation.isPending} onAdminister={(units) => handleAction('insulin', { insulinUnits: units })} />
               </DialogContent>
             </Dialog>
             <Button size="icon" variant="default" className="w-14 h-14 rounded-2xl shadow-lg bg-blue-500 hover:bg-blue-600 hover-elevate" onClick={() => setChatOpen(!chatOpen)}>
