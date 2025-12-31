@@ -34,6 +34,15 @@ export function PetAvatar({ pet, className }: PetAvatarProps) {
     }
   };
 
+  const sleep = {
+    scale: [1, 1.02, 1],
+    transition: {
+      duration: 3,
+      repeat: Infinity,
+      ease: "easeInOut"
+    }
+  };
+
   const shake = {
     x: [0, -2, 2, -2, 2, 0],
     transition: {
