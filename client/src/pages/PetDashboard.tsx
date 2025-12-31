@@ -24,6 +24,12 @@ export function PetDashboard({ pet }: PetDashboardProps) {
 
   const [namingOpen, setNamingOpen] = useState(!pet.name || pet.name === "Diabeats");
   const [petName, setPetName] = useState("");
+  const [chatOpen, setChatOpen] = useState(false);
+  const [bloodTestOpen, setBloodTestOpen] = useState(false);
+  const [foodMenuOpen, setFoodMenuOpen] = useState(false);
+  const [insulinMenuOpen, setInsulinMenuOpen] = useState(false);
+  const [chatInput, setChatInput] = useState("");
+  const [chatHistory, setChatHistory] = useState<{role: 'user'|'pet', text: string}[]>([]);
 
   const nameMutation = useMutation({
     mutationFn: async (name: string) => {
@@ -36,7 +42,7 @@ export function PetDashboard({ pet }: PetDashboardProps) {
     }
   });
 
-  const handleAction = (type: 'feed' | 'insulin' | 'sleep' | 'wake' | 'play', extra?: any) => {
+  const bloodTestMutation = useMutation({
     mutationFn: async () => {
       const res = await apiRequest("POST", `/api/pets/${pet.id}/blood-test`);
       return res.json();
@@ -46,10 +52,6 @@ export function PetDashboard({ pet }: PetDashboardProps) {
       setBloodTestOpen(false);
     }
   });
-
-  const handleAction = (type: 'feed' | 'insulin' | 'sleep' | 'wake' | 'play', extra?: any) => {
-    handleActionMutation.mutate({ id: pet.id, type, ...extra });
-  };
 
   const handleActionMutation = useMutation({
     mutationFn: async (data: any) => {
@@ -62,6 +64,10 @@ export function PetDashboard({ pet }: PetDashboardProps) {
       if (variables.type === 'insulin') setInsulinMenuOpen(false);
     }
   });
+
+  const handleAction = (type: 'feed' | 'insulin' | 'sleep' | 'wake' | 'play', extra?: any) => {
+    handleActionMutation.mutate({ id: pet.id, type, ...extra });
+  };
 
   const handleChat = (e: React.FormEvent) => {
     e.preventDefault();
