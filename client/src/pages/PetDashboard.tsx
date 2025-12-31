@@ -86,10 +86,20 @@ export function PetDashboard({ pet }: PetDashboardProps) {
           </div>
         </div>
 
-        <div className="flex-1 flex items-center justify-center relative bg-gradient-to-b from-primary/5 to-transparent">
+        <div className="flex-1 flex flex-col items-center justify-center relative bg-gradient-to-b from-primary/5 to-transparent">
           <motion.div initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="w-full px-8">
             <PetAvatar pet={pet} className="w-full max-w-[280px] mx-auto drop-shadow-[0_0_50px_rgba(59,130,246,0.3)]" />
           </motion.div>
+          
+          <div className="mt-4 text-center px-6">
+            <h2 className="text-2xl font-display font-bold text-primary mb-1">{pet.name}</h2>
+            <div className="bg-muted/50 backdrop-blur-sm rounded-2xl p-3 border border-white/5 min-h-[60px] flex items-center justify-center">
+              <p className="text-sm italic text-muted-foreground">
+                {pet.activeScenario ? pet.scenarioDescription : "I'm feeling good! Ready to play?"}
+              </p>
+            </div>
+          </div>
+
           <div className="absolute bottom-32 left-0 right-0 px-6 flex justify-between items-center">
             <Button size="icon" variant="secondary" className="w-14 h-14 rounded-2xl shadow-lg hover-elevate" onClick={() => handleAction(pet.isAsleep ? 'wake' : 'sleep')} disabled={actionPending}>
               {pet.isAsleep ? <Sun className="w-6 h-6" /> : <Moon className="w-6 h-6" />}
@@ -148,10 +158,10 @@ export function PetDashboard({ pet }: PetDashboardProps) {
                <div className="h-full bg-primary" style={{ width: `${experiencePercent}%` }} />
             </div>
           </div>
-          <Button variant="ghost" size="icon" className="w-12 h-12 text-muted-foreground hover:text-primary hover-elevate">
+          <Button variant="ghost" size="icon" className="w-12 h-12 text-muted-foreground hover:text-primary hover-elevate" onClick={() => window.location.href = "/"}>
              <Stethoscope className="w-6 h-6" />
           </Button>
-          <Button variant="ghost" size="icon" className="w-12 h-12 text-muted-foreground hover:text-primary hover-elevate">
+          <Button variant="ghost" size="icon" className="w-12 h-12 text-muted-foreground hover:text-primary hover-elevate" onClick={() => window.location.href = "/"}>
              <Zap className="w-6 h-6" />
           </Button>
         </div>

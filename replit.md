@@ -1,8 +1,8 @@
-# GlucoPet
+# DiaPet
 
 ## Overview
 
-GlucoPet is an educational virtual pet application designed to help children learn diabetes management through interactive gameplay. Users adopt and care for a virtual pet, managing its blood sugar levels through feeding, insulin administration, and monitoring activities. The app gamifies diabetes education with a playful, kid-friendly interface featuring bouncy animations and colorful visuals.
+DiaPet is an educational virtual pet application designed to help children learn diabetes management through interactive gameplay. Users adopt and care for a virtual pet, managing its blood sugar levels through feeding, insulin administration, and monitoring activities. The app gamifies diabetes education with a playful, kid-friendly interface featuring bouncy animations and colorful visuals.
 
 ## User Preferences
 

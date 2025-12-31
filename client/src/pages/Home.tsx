@@ -21,7 +21,7 @@ export default function Home() {
   if (!user) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-background p-4 text-center">
-        <h1 className="text-6xl md:text-8xl mb-6 text-primary font-display font-bold">GlucoPet</h1>
+        <h1 className="text-6xl md:text-8xl mb-6 text-primary font-display font-bold">DiaPet</h1>
         <p className="text-xl text-muted-foreground mb-8 max-w-md font-body">
           Your friendly buddy for learning diabetes management!
         </p>
