@@ -100,13 +100,13 @@ export function PetDashboard({ pet }: PetDashboardProps) {
             </div>
           </div>
 
-          <div className="absolute bottom-32 left-0 right-0 px-6 flex justify-between items-center">
-            <Button size="icon" variant="secondary" className="w-14 h-14 rounded-2xl shadow-lg hover-elevate" onClick={() => handleAction(pet.isAsleep ? 'wake' : 'sleep')} disabled={actionPending}>
+          <div className="mt-6 px-6 flex justify-around items-center w-full max-w-[320px]">
+            <Button size="icon" variant="default" className="w-14 h-14 rounded-2xl shadow-lg bg-blue-500 hover:bg-blue-600 hover-elevate" onClick={() => handleAction(pet.isAsleep ? 'wake' : 'sleep')} disabled={actionPending}>
               {pet.isAsleep ? <Sun className="w-6 h-6" /> : <Moon className="w-6 h-6" />}
             </Button>
             <Dialog>
               <DialogTrigger asChild>
-                <Button size="icon" variant="secondary" className="w-14 h-14 rounded-2xl shadow-lg hover-elevate" disabled={pet.isAsleep || actionPending}>
+                <Button size="icon" variant="default" className="w-14 h-14 rounded-2xl shadow-lg bg-blue-500 hover:bg-blue-600 hover-elevate" disabled={pet.isAsleep || actionPending}>
                   <Utensils className="w-6 h-6" />
                 </Button>
               </DialogTrigger>
@@ -117,7 +117,7 @@ export function PetDashboard({ pet }: PetDashboardProps) {
             </Dialog>
             <Dialog>
               <DialogTrigger asChild>
-                <Button size="icon" variant="secondary" className="w-14 h-14 rounded-2xl shadow-lg hover-elevate" disabled={pet.isAsleep || actionPending}>
+                <Button size="icon" variant="default" className="w-14 h-14 rounded-2xl shadow-lg bg-blue-500 hover:bg-blue-600 hover-elevate" disabled={pet.isAsleep || actionPending}>
                   <Activity className="w-6 h-6" />
                 </Button>
               </DialogTrigger>
@@ -126,7 +126,7 @@ export function PetDashboard({ pet }: PetDashboardProps) {
                 <InsulinControl currentBloodSugar={pet.bloodSugar} isPending={actionPending} onAdminister={(units) => handleAction('insulin', { insulinUnits: units })} />
               </DialogContent>
             </Dialog>
-            <Button size="icon" variant="secondary" className="w-14 h-14 rounded-2xl shadow-lg hover-elevate" onClick={() => setChatOpen(!chatOpen)}>
+            <Button size="icon" variant="default" className="w-14 h-14 rounded-2xl shadow-lg bg-blue-500 hover:bg-blue-600 hover-elevate" onClick={() => setChatOpen(!chatOpen)}>
               <MessageCircle className="w-6 h-6" />
             </Button>
           </div>
