@@ -204,6 +204,16 @@ export function PetDashboard({ pet }: PetDashboardProps) {
               <div className="bg-card p-6 rounded-3xl w-full mb-8 shadow-xl">
                  <p className="text-sm uppercase tracking-widest text-muted-foreground mb-2">Reading...</p>
                  <p className="text-5xl font-bold text-primary">{pet.bloodSugar} mg/dL</p>
+                 {pet.activeScenario && (
+                   <div className="mt-4 p-3 bg-primary/10 rounded-xl text-xs text-left border border-primary/20">
+                     <p className="font-bold text-primary mb-1">Education Tip:</p>
+                     <p className="text-muted-foreground leading-relaxed">
+                       {pet.activeScenario === 'sport' && "Exercise helps your body use sugar for energy, which can make your levels go down!"}
+                       {pet.activeScenario === 'party' && "Sugary snacks have lots of carbs that turn into sugar in your blood quickly!"}
+                       {pet.activeScenario === 'nap' && "Even when resting, our bodies use energy. Monitoring helps us stay in balance!"}
+                     </p>
+                   </div>
+                 )}
               </div>
               <div className="flex flex-col gap-3 w-full">
                 <Button size="lg" className="h-16 rounded-2xl text-xl font-bold" onClick={() => bloodTestMutation.mutate()} disabled={bloodTestMutation.isPending}>
