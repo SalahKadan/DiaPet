@@ -17,36 +17,48 @@ export function PetAvatar({ pet, className }: PetAvatarProps) {
   if (pet.isAsleep) expression = "😴";
   else if (pet.bloodSugar < 70) expression = "😵"; // Low sugar
   else if (pet.bloodSugar > 180) expression = "🤢"; // High sugar
+  else if (pet.health < 40) expression = "😟"; // Poor health
+  else if (pet.hunger > 80) expression = "🤤"; // Very hungry
+  else if (pet.energy < 30) expression = "🥱"; // Low energy
   else if (pet.mood === "happy") expression = "😄";
   else if (pet.mood === "sad") expression = "😢";
 
   // Animation variants
   const bounce = {
     y: [0, -10, 0],
+    scale: pet.health < 40 ? [1, 0.98, 1] : [1, 1.05, 1],
     transition: {
-      duration: 2,
+      duration: pet.bloodSugar < 70 || pet.bloodSugar > 180 ? 1 : 2,
       repeat: Infinity,
       ease: "easeInOut"
     }
   };
 
-  const sleep = {
-    scale: [1, 1.02, 1],
+  const shake = {
+    x: [0, -2, 2, -2, 2, 0],
     transition: {
-      duration: 3,
+      duration: 0.5,
       repeat: Infinity,
-      ease: "easeInOut"
+      ease: "linear"
     }
   };
+
+  const animation = pet.isAsleep ? sleep : (pet.bloodSugar < 70 || pet.bloodSugar > 180 ? { ...bounce, ...shake } : bounce);
 
   return (
     <div className={cn("relative w-64 h-64 mx-auto flex items-center justify-center", className)}>
       {/* Background Glow */}
-      <div className="absolute inset-0 bg-primary/20 blur-3xl rounded-full scale-75 animate-pulse" />
+      <div className={cn(
+        "absolute inset-0 blur-3xl rounded-full scale-75 animate-pulse",
+        pet.bloodSugar < 70 || pet.bloodSugar > 180 ? "bg-red-500/20" : "bg-primary/20"
+      )} />
 
       <motion.div
-        animate={pet.isAsleep ? sleep : bounce}
-        className="relative z-10 w-48 h-48 bg-white rounded-full shadow-2xl border-4 border-white flex items-center justify-center text-9xl select-none"
+        animate={animation}
+        className={cn(
+          "relative z-10 w-48 h-48 bg-white rounded-full shadow-2xl border-4 flex items-center justify-center text-9xl select-none",
+          pet.bloodSugar < 70 || pet.bloodSugar > 180 ? "border-red-200" : "border-white"
+        )}
       >
         {expression}
         
