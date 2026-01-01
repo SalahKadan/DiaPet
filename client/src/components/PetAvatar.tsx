@@ -58,7 +58,7 @@ export function PetAvatar({ pet, className }: PetAvatarProps) {
     <div className={cn("relative w-64 h-64 mx-auto flex items-center justify-center", className)}>
       <div className={cn(
         "absolute inset-0 blur-3xl rounded-full scale-75 animate-pulse",
-        isDistressed ? "bg-red-500/20" : "bg-primary/20"
+        isDistressed ? "bg-red-500/20" : "bg-blue-400/20"
       )} />
 
       <motion.div
@@ -67,13 +67,18 @@ export function PetAvatar({ pet, className }: PetAvatarProps) {
       >
         <svg viewBox="0 0 200 200" className="w-56 h-56 drop-shadow-2xl">
           <defs>
-            <linearGradient id="catFur" x1="0%" y1="0%" x2="0%" y2="100%">
-              <stop offset="0%" stopColor="#FFD89B" />
-              <stop offset="100%" stopColor="#F5C57A" />
+            <linearGradient id="ragdollFur" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stopColor="#FFFFFF" />
+              <stop offset="100%" stopColor="#F5F0EB" />
             </linearGradient>
-            <linearGradient id="catFurDark" x1="0%" y1="0%" x2="0%" y2="100%">
-              <stop offset="0%" stopColor="#E8C078" />
-              <stop offset="100%" stopColor="#D4A85A" />
+            <linearGradient id="ragdollFurShadow" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stopColor="#EDE8E3" />
+              <stop offset="100%" stopColor="#E0D8D0" />
+            </linearGradient>
+            <linearGradient id="blueEyes" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stopColor="#60A5FA" />
+              <stop offset="50%" stopColor="#3B82F6" />
+              <stop offset="100%" stopColor="#2563EB" />
             </linearGradient>
             <linearGradient id="sensorGrad" x1="0%" y1="0%" x2="100%" y2="100%">
               <stop offset="0%" stopColor="#60A5FA" />
@@ -82,23 +87,39 @@ export function PetAvatar({ pet, className }: PetAvatarProps) {
             <filter id="softShadow" x="-20%" y="-20%" width="140%" height="140%">
               <feDropShadow dx="0" dy="4" stdDeviation="4" floodOpacity="0.15"/>
             </filter>
+            <filter id="fluffyEdge" x="-10%" y="-10%" width="120%" height="120%">
+              <feTurbulence type="fractalNoise" baseFrequency="0.05" numOctaves="2" result="noise"/>
+              <feDisplacementMap in="SourceGraphic" in2="noise" scale="3" xChannelSelector="R" yChannelSelector="G"/>
+            </filter>
           </defs>
 
-          <ellipse cx="100" cy="150" rx="55" ry="45" fill="url(#catFur)" filter="url(#softShadow)" />
+          <ellipse cx="100" cy="155" rx="58" ry="42" fill="url(#ragdollFur)" filter="url(#softShadow)" />
+          <ellipse cx="70" cy="160" rx="12" ry="8" fill="url(#ragdollFurShadow)" opacity="0.5"/>
+          <ellipse cx="130" cy="160" rx="12" ry="8" fill="url(#ragdollFurShadow)" opacity="0.5"/>
 
-          <path d="M35 85 L55 45 L70 75 Z" fill="url(#catFur)" stroke="url(#catFurDark)" strokeWidth="2"/>
-          <path d="M165 85 L145 45 L130 75 Z" fill="url(#catFur)" stroke="url(#catFurDark)" strokeWidth="2"/>
-          <path d="M45 78 L55 55 L63 72 Z" fill="#FFBCD9"/>
-          <path d="M155 78 L145 55 L137 72 Z" fill="#FFBCD9"/>
+          <path d="M30 90 L48 40 L62 72 Z" fill="url(#ragdollFur)" stroke="url(#ragdollFurShadow)" strokeWidth="1"/>
+          <path d="M170 90 L152 40 L138 72 Z" fill="url(#ragdollFur)" stroke="url(#ragdollFurShadow)" strokeWidth="1"/>
+          <path d="M40 78 L48 52 L55 72 Z" fill="#FFCDD2"/>
+          <path d="M160 78 L152 52 L145 72 Z" fill="#FFCDD2"/>
+          
+          <ellipse cx="32" cy="75" rx="8" ry="6" fill="url(#ragdollFur)" opacity="0.8"/>
+          <ellipse cx="168" cy="75" rx="8" ry="6" fill="url(#ragdollFur)" opacity="0.8"/>
+          <ellipse cx="28" cy="85" rx="6" ry="5" fill="url(#ragdollFur)" opacity="0.6"/>
+          <ellipse cx="172" cy="85" rx="6" ry="5" fill="url(#ragdollFur)" opacity="0.6"/>
 
-          <ellipse cx="100" cy="100" rx="58" ry="52" fill="url(#catFur)" filter="url(#softShadow)" />
+          <ellipse cx="100" cy="100" rx="60" ry="55" fill="url(#ragdollFur)" filter="url(#softShadow)" />
+          
+          <ellipse cx="45" cy="95" rx="12" ry="10" fill="url(#ragdollFur)" opacity="0.9"/>
+          <ellipse cx="155" cy="95" rx="12" ry="10" fill="url(#ragdollFur)" opacity="0.9"/>
+          <ellipse cx="40" cy="105" rx="8" ry="7" fill="url(#ragdollFur)" opacity="0.7"/>
+          <ellipse cx="160" cy="105" rx="8" ry="7" fill="url(#ragdollFur)" opacity="0.7"/>
 
-          <ellipse cx="100" cy="115" rx="20" ry="12" fill="#FFF5E6" opacity="0.7"/>
+          <ellipse cx="100" cy="118" rx="22" ry="14" fill="#FFF8F5" opacity="0.9"/>
 
           {eyeExpression === "sleeping" ? (
             <>
-              <path d="M65 90 Q75 95 85 90" stroke="#5D4037" strokeWidth="3" strokeLinecap="round" fill="none"/>
-              <path d="M115 90 Q125 95 135 90" stroke="#5D4037" strokeWidth="3" strokeLinecap="round" fill="none"/>
+              <path d="M60 92 Q72 98 84 92" stroke="#8B7355" strokeWidth="3" strokeLinecap="round" fill="none"/>
+              <path d="M116 92 Q128 98 140 92" stroke="#8B7355" strokeWidth="3" strokeLinecap="round" fill="none"/>
               <motion.text
                 x="155"
                 y="70"
@@ -122,89 +143,91 @@ export function PetAvatar({ pet, className }: PetAvatarProps) {
             </>
           ) : (
             <>
-              <ellipse cx="70" cy="90" rx="16" ry={eyeExpression === "happy" ? 10 : 18} fill="white" />
-              <ellipse cx="130" cy="90" rx="16" ry={eyeExpression === "happy" ? 10 : 18} fill="white" />
+              <ellipse cx="70" cy="90" rx="18" ry={eyeExpression === "happy" ? 12 : 20} fill="white" stroke="#E8E0D8" strokeWidth="1" />
+              <ellipse cx="130" cy="90" rx="18" ry={eyeExpression === "happy" ? 12 : 20} fill="white" stroke="#E8E0D8" strokeWidth="1" />
 
               {eyeExpression === "happy" ? (
                 <>
-                  <path d="M58 88 Q70 95 82 88" stroke="#5D4037" strokeWidth="3" strokeLinecap="round" fill="none"/>
-                  <path d="M118 88 Q130 95 142 88" stroke="#5D4037" strokeWidth="3" strokeLinecap="round" fill="none"/>
+                  <path d="M56 88 Q70 98 84 88" stroke="url(#blueEyes)" strokeWidth="4" strokeLinecap="round" fill="none"/>
+                  <path d="M116 88 Q130 98 144 88" stroke="url(#blueEyes)" strokeWidth="4" strokeLinecap="round" fill="none"/>
                 </>
               ) : eyeExpression === "worried" ? (
                 <>
-                  <ellipse cx="70" cy="92" rx="10" ry="12" fill="#5D4037" />
-                  <ellipse cx="130" cy="92" rx="10" ry="12" fill="#5D4037" />
-                  <ellipse cx="72" cy="88" rx="4" ry="5" fill="white" />
-                  <ellipse cx="132" cy="88" rx="4" ry="5" fill="white" />
-                  <path d="M55 78 L80 82" stroke="#5D4037" strokeWidth="2.5" strokeLinecap="round"/>
-                  <path d="M145 78 L120 82" stroke="#5D4037" strokeWidth="2.5" strokeLinecap="round"/>
+                  <ellipse cx="70" cy="92" rx="11" ry="14" fill="url(#blueEyes)" />
+                  <ellipse cx="130" cy="92" rx="11" ry="14" fill="url(#blueEyes)" />
+                  <ellipse cx="67" cy="88" rx="4" ry="5" fill="white" />
+                  <ellipse cx="127" cy="88" rx="4" ry="5" fill="white" />
+                  <circle cx="73" cy="95" r="2" fill="white" opacity="0.5"/>
+                  <circle cx="133" cy="95" r="2" fill="white" opacity="0.5"/>
+                  <path d="M52 78 L82 84" stroke="#8B7355" strokeWidth="2.5" strokeLinecap="round"/>
+                  <path d="M148 78 L118 84" stroke="#8B7355" strokeWidth="2.5" strokeLinecap="round"/>
                 </>
               ) : eyeExpression === "sad" ? (
                 <>
-                  <ellipse cx="70" cy="94" rx="9" ry="11" fill="#5D4037" />
-                  <ellipse cx="130" cy="94" rx="9" ry="11" fill="#5D4037" />
-                  <ellipse cx="72" cy="90" rx="3" ry="4" fill="white" />
-                  <ellipse cx="132" cy="90" rx="3" ry="4" fill="white" />
-                  <path d="M58 80 Q70 85 82 80" stroke="#5D4037" strokeWidth="2" strokeLinecap="round" fill="none"/>
-                  <path d="M118 80 Q130 85 142 80" stroke="#5D4037" strokeWidth="2" strokeLinecap="round" fill="none"/>
+                  <ellipse cx="70" cy="94" rx="10" ry="12" fill="url(#blueEyes)" />
+                  <ellipse cx="130" cy="94" rx="10" ry="12" fill="url(#blueEyes)" />
+                  <ellipse cx="67" cy="90" rx="4" ry="5" fill="white" />
+                  <ellipse cx="127" cy="90" rx="4" ry="5" fill="white" />
+                  <path d="M55 80 Q70 86 85 80" stroke="#8B7355" strokeWidth="2" strokeLinecap="round" fill="none"/>
+                  <path d="M115 80 Q130 86 145 80" stroke="#8B7355" strokeWidth="2" strokeLinecap="round" fill="none"/>
                 </>
               ) : eyeExpression === "hungry" ? (
                 <>
-                  <ellipse cx="70" cy="90" rx="12" ry="14" fill="#5D4037" />
-                  <ellipse cx="130" cy="90" rx="12" ry="14" fill="#5D4037" />
-                  <ellipse cx="73" cy="86" rx="5" ry="6" fill="white" />
-                  <ellipse cx="133" cy="86" rx="5" ry="6" fill="white" />
-                  <ellipse cx="70" cy="94" rx="3" ry="3" fill="white" opacity="0.5" />
-                  <ellipse cx="130" cy="94" rx="3" ry="3" fill="white" opacity="0.5" />
+                  <ellipse cx="70" cy="90" rx="13" ry="16" fill="url(#blueEyes)" />
+                  <ellipse cx="130" cy="90" rx="13" ry="16" fill="url(#blueEyes)" />
+                  <ellipse cx="67" cy="85" rx="5" ry="6" fill="white" />
+                  <ellipse cx="127" cy="85" rx="5" ry="6" fill="white" />
+                  <circle cx="73" cy="94" r="3" fill="white" opacity="0.4"/>
+                  <circle cx="133" cy="94" r="3" fill="white" opacity="0.4"/>
                 </>
               ) : eyeExpression === "tired" ? (
                 <>
-                  <ellipse cx="70" cy="92" rx="8" ry="10" fill="#5D4037" />
-                  <ellipse cx="130" cy="92" rx="8" ry="10" fill="#5D4037" />
-                  <ellipse cx="72" cy="88" rx="3" ry="4" fill="white" />
-                  <ellipse cx="132" cy="88" rx="3" ry="4" fill="white" />
-                  <path d="M54 85 L86 82" stroke="#5D4037" strokeWidth="2" strokeLinecap="round"/>
-                  <path d="M146 85 L114 82" stroke="#5D4037" strokeWidth="2" strokeLinecap="round"/>
+                  <ellipse cx="70" cy="92" rx="9" ry="11" fill="url(#blueEyes)" />
+                  <ellipse cx="130" cy="92" rx="9" ry="11" fill="url(#blueEyes)" />
+                  <ellipse cx="67" cy="88" rx="4" ry="5" fill="white" />
+                  <ellipse cx="127" cy="88" rx="4" ry="5" fill="white" />
+                  <path d="M52 84 L88 80" stroke="#8B7355" strokeWidth="2" strokeLinecap="round"/>
+                  <path d="M148 84 L112 80" stroke="#8B7355" strokeWidth="2" strokeLinecap="round"/>
                 </>
               ) : (
                 <>
-                  <ellipse cx="70" cy="90" rx="11" ry="14" fill="#5D4037" />
-                  <ellipse cx="130" cy="90" rx="11" ry="14" fill="#5D4037" />
-                  <ellipse cx="73" cy="86" rx="5" ry="6" fill="white" />
-                  <ellipse cx="133" cy="86" rx="5" ry="6" fill="white" />
-                  <ellipse cx="70" cy="93" rx="2" ry="2" fill="white" opacity="0.4" />
-                  <ellipse cx="130" cy="93" rx="2" ry="2" fill="white" opacity="0.4" />
+                  <ellipse cx="70" cy="90" rx="12" ry="15" fill="url(#blueEyes)" />
+                  <ellipse cx="130" cy="90" rx="12" ry="15" fill="url(#blueEyes)" />
+                  <ellipse cx="67" cy="85" rx="5" ry="6" fill="white" />
+                  <ellipse cx="127" cy="85" rx="5" ry="6" fill="white" />
+                  <circle cx="73" cy="93" r="2.5" fill="white" opacity="0.4"/>
+                  <circle cx="133" cy="93" r="2.5" fill="white" opacity="0.4"/>
                 </>
               )}
             </>
           )}
 
-          <ellipse cx="100" cy="112" rx="6" ry="4" fill="#FFBCD9" />
-          <path d="M100 116 L100 122" stroke="#D4A05A" strokeWidth="1.5"/>
+          <ellipse cx="100" cy="115" rx="7" ry="5" fill="#FFCDD2" />
+          <path d="M100 120 L100 126" stroke="#E0D0C8" strokeWidth="1.5"/>
 
           {eyeExpression !== "sleeping" && (
             <path 
               d={eyeExpression === "happy" || eyeExpression === "hungry" 
-                ? "M90 122 Q100 132 110 122" 
+                ? "M88 126 Q100 138 112 126" 
                 : eyeExpression === "worried" || eyeExpression === "sad"
-                ? "M92 128 Q100 122 108 128"
-                : "M92 125 Q100 128 108 125"
+                ? "M90 132 Q100 126 110 132"
+                : "M90 128 Q100 132 110 128"
               } 
-              stroke="#5D4037" 
+              stroke="#C4A494" 
               strokeWidth="2" 
               strokeLinecap="round" 
               fill="none"
             />
           )}
 
-          <line x1="45" y1="108" x2="20" y2="100" stroke="#D4A85A" strokeWidth="1.5" strokeLinecap="round"/>
-          <line x1="45" y1="115" x2="18" y2="115" stroke="#D4A85A" strokeWidth="1.5" strokeLinecap="round"/>
-          <line x1="45" y1="122" x2="20" y2="130" stroke="#D4A85A" strokeWidth="1.5" strokeLinecap="round"/>
-          <line x1="155" y1="108" x2="180" y2="100" stroke="#D4A85A" strokeWidth="1.5" strokeLinecap="round"/>
-          <line x1="155" y1="115" x2="182" y2="115" stroke="#D4A85A" strokeWidth="1.5" strokeLinecap="round"/>
-          <line x1="155" y1="122" x2="180" y2="130" stroke="#D4A85A" strokeWidth="1.5" strokeLinecap="round"/>
+          <line x1="42" y1="112" x2="15" y2="104" stroke="#E0D8D0" strokeWidth="1.5" strokeLinecap="round"/>
+          <line x1="42" y1="118" x2="12" y2="118" stroke="#E0D8D0" strokeWidth="1.5" strokeLinecap="round"/>
+          <line x1="42" y1="124" x2="15" y2="132" stroke="#E0D8D0" strokeWidth="1.5" strokeLinecap="round"/>
+          <line x1="158" y1="112" x2="185" y2="104" stroke="#E0D8D0" strokeWidth="1.5" strokeLinecap="round"/>
+          <line x1="158" y1="118" x2="188" y2="118" stroke="#E0D8D0" strokeWidth="1.5" strokeLinecap="round"/>
+          <line x1="158" y1="124" x2="185" y2="132" stroke="#E0D8D0" strokeWidth="1.5" strokeLinecap="round"/>
 
-          <g transform="translate(140, 130)">
+          <g transform="translate(145, 135)">
             <ellipse cx="0" cy="0" rx="14" ry="10" fill="url(#sensorGrad)" filter="url(#softShadow)"/>
             <ellipse cx="0" cy="0" rx="10" ry="7" fill="#93C5FD" />
             <ellipse cx="-2" cy="-2" rx="3" ry="2" fill="white" opacity="0.6"/>
@@ -225,8 +248,8 @@ export function PetAvatar({ pet, className }: PetAvatarProps) {
               animate={{ opacity: [0, 1, 0] }}
               transition={{ duration: 0.8, repeat: Infinity }}
             >
-              <circle cx="55" cy="105" r="3" fill="#60A5FA" opacity="0.7"/>
-              <circle cx="145" cy="105" r="3" fill="#60A5FA" opacity="0.7"/>
+              <circle cx="52" cy="108" r="3" fill="#60A5FA" opacity="0.7"/>
+              <circle cx="148" cy="108" r="3" fill="#60A5FA" opacity="0.7"/>
             </motion.g>
           )}
         </svg>
