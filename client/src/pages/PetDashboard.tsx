@@ -81,8 +81,14 @@ export function PetDashboard({ pet }: PetDashboardProps) {
     if (isTired) {
       instructions.push("I'm feeling tired. Let me take a nap to restore my energy.");
     }
-    if (isUnhealthy && !isBloodSugarLow && !isBloodSugarHigh) {
-      instructions.push("My health is low. Keep my blood sugar balanced to help me feel better!");
+    if (isUnhealthy) {
+      if (isBloodSugarLow) {
+        instructions.push("My health is dropping because my blood sugar is low. Food will help restore my HP!");
+      } else if (isBloodSugarHigh) {
+        instructions.push("My health is dropping because my blood sugar is high. Insulin will help restore my HP!");
+      } else {
+        instructions.push("My health is low. Keep my blood sugar in the green zone (70-180) and I'll feel better!");
+      }
     }
     
     return instructions;
