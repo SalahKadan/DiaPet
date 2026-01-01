@@ -72,6 +72,30 @@ export async function registerRoutes(
     }
   });
 
+  app.patch("/api/pets/:id", async (req, res) => {
+    try {
+      const petId = Number(req.params.id);
+      const { name } = req.body;
+      
+      const pet = await storage.getPet(petId);
+      if (!pet) {
+        res.status(404).json({ message: "Pet not found" });
+        return;
+      }
+
+      const updates: any = {};
+      if (name && typeof name === "string") {
+        updates.name = name.trim();
+      }
+
+      const updatedPet = await storage.updatePet(petId, updates);
+      res.json(updatedPet);
+    } catch (err) {
+      console.error("Error updating pet:", err);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
   app.post(api.pets.action.path, async (req, res) => {
     try {
       const petId = Number(req.params.id);
