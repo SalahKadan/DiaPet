@@ -21,10 +21,12 @@ export const pets = pgTable("pets", {
   isAsleep: boolean("is_asleep").notNull().default(false),
   level: integer("level").notNull().default(1),
   experience: integer("experience").notNull().default(0),
+  coins: integer("coins").notNull().default(0),
   activeScenario: text("active_scenario"),
   scenarioDescription: text("scenario_description"),
   lastFed: timestamp("last_fed").defaultNow(),
   lastInsulin: timestamp("last_insulin").defaultNow(),
+  lastBloodTest: timestamp("last_blood_test"),
   createdAt: timestamp("created_at").defaultNow(),
 });
 

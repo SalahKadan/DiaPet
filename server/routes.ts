@@ -189,6 +189,24 @@ export async function registerRoutes(
       return;
     }
 
+    // Check cooldown (60 seconds)
+    const cooldownSeconds = 60;
+    const now = new Date();
+    if (pet.lastBloodTest) {
+      const lastTest = new Date(pet.lastBloodTest);
+      const elapsedSeconds = (now.getTime() - lastTest.getTime()) / 1000;
+      if (elapsedSeconds < cooldownSeconds) {
+        const remainingSeconds = Math.ceil(cooldownSeconds - elapsedSeconds);
+        res.json({ 
+          success: false, 
+          cooldown: true, 
+          remainingSeconds,
+          pet 
+        });
+        return;
+      }
+    }
+
     const updates: any = {};
     // Solving diabetes scenarios or just a regular check
     // If there's an active scenario, completing it gives more XP
@@ -203,11 +221,18 @@ export async function registerRoutes(
 
     updates.experience = newExp;
     updates.level = newLevel;
-    updates.activeScenario = null; // Clear scenario after test
+    updates.coins = (pet.coins || 0) + 1;
+    updates.lastBloodTest = now;
+    updates.activeScenario = null;
     updates.scenarioDescription = null;
 
     const updatedPet = await storage.updatePet(petId, updates);
-    res.json(updatedPet);
+    res.json({ 
+      success: true, 
+      cooldown: false,
+      coinsEarned: 1,
+      pet: updatedPet 
+    });
   });
 
   app.post("/api/pets/:id/auto-heal", async (req, res) => {
