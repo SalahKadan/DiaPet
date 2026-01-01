@@ -35,6 +35,9 @@ export function PetDashboard({ pet }: PetDashboardProps) {
   const [showBloodTestAnimation, setShowBloodTestAnimation] = useState(false);
   const [bloodTestPhase, setBloodTestPhase] = useState<'idle' | 'finger' | 'testing' | 'result' | 'reward'>('idle');
   const [earnedCoin, setEarnedCoin] = useState(false);
+  const [showLevelUp, setShowLevelUp] = useState(false);
+  const [newLevel, setNewLevel] = useState(0);
+  const [showChallengeComplete, setShowChallengeComplete] = useState(false);
   const lastScenarioRef = useRef<string | null>(null);
   const challengeIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -83,8 +86,8 @@ export function PetDashboard({ pet }: PetDashboardProps) {
   }, [pet.id, pet.isAsleep]);
 
   const isBloodSugarGood = pet.bloodSugar >= 70 && pet.bloodSugar <= 180;
-  const isNotHungry = pet.hunger >= 40;
-  const isNotTired = pet.energy >= 30;
+  const isNotHungry = pet.hunger >= 50;
+  const isNotTired = pet.energy >= 40;
   const isPetGood = isBloodSugarGood && isNotHungry && isNotTired;
 
   const autoHealMutation = useMutation({
@@ -93,20 +96,28 @@ export function PetDashboard({ pet }: PetDashboardProps) {
       return res.json();
     },
     onSuccess: (data) => {
-      if (data.healed) {
+      if (data.healed || data.challengeCompleted || data.leveledUp) {
         queryClient.invalidateQueries({ queryKey: ["/api/pets"] });
+      }
+      if (data.challengeCompleted) {
+        setShowChallengeComplete(true);
+        setTimeout(() => setShowChallengeComplete(false), 3000);
+      }
+      if (data.leveledUp) {
+        setNewLevel(data.newLevel);
+        setShowLevelUp(true);
+        setTimeout(() => setShowLevelUp(false), 4000);
       }
     }
   });
 
   useEffect(() => {
+    const checkInterval = pet.activeScenario ? 2000 : 30000;
     const healInterval = setInterval(() => {
-      if (isPetGood && pet.health < 100) {
-        autoHealMutation.mutate();
-      }
-    }, 30000);
+      autoHealMutation.mutate();
+    }, checkInterval);
     return () => clearInterval(healInterval);
-  }, [pet.id, isPetGood, pet.health]);
+  }, [pet.id, isPetGood, pet.health, pet.activeScenario]);
 
   const tickMutation = useMutation({
     mutationFn: async () => {
@@ -366,6 +377,89 @@ export function PetDashboard({ pet }: PetDashboardProps) {
                   </motion.div>
                 )}
               </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        <AnimatePresence>
+          {showChallengeComplete && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.8 }}
+              className="absolute inset-0 z-[95] bg-green-500/20 backdrop-blur-sm flex flex-col items-center justify-center p-8"
+            >
+              <motion.div
+                initial={{ y: 20 }}
+                animate={{ y: 0 }}
+                className="bg-white dark:bg-gray-800 rounded-3xl p-8 shadow-2xl text-center max-w-sm"
+              >
+                <motion.div
+                  animate={{ rotate: [0, 10, -10, 0] }}
+                  transition={{ repeat: 2, duration: 0.3 }}
+                  className="text-6xl mb-4"
+                >
+                  <Heart className="w-16 h-16 mx-auto text-green-500" />
+                </motion.div>
+                <h2 className="text-2xl font-bold text-green-600 mb-2">Challenge Complete!</h2>
+                <p className="text-muted-foreground mb-4">Great job! You helped your pet feel better!</p>
+                <div className="flex items-center justify-center gap-4">
+                  <div className="flex items-center gap-2 bg-purple-100 dark:bg-purple-900/50 px-4 py-2 rounded-full">
+                    <Zap className="w-5 h-5 text-purple-500" />
+                    <span className="font-bold text-purple-600">+40 XP</span>
+                  </div>
+                  <div className="flex items-center gap-2 bg-yellow-100 dark:bg-yellow-900/50 px-4 py-2 rounded-full">
+                    <Coins className="w-5 h-5 text-yellow-500" />
+                    <span className="font-bold text-yellow-600">+5</span>
+                  </div>
+                </div>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        <AnimatePresence>
+          {showLevelUp && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="absolute inset-0 z-[98] bg-gradient-to-b from-purple-500/30 to-blue-500/30 backdrop-blur-md flex flex-col items-center justify-center p-8"
+            >
+              <motion.div
+                initial={{ scale: 0.5, y: 50 }}
+                animate={{ scale: 1, y: 0 }}
+                exit={{ scale: 0.8, y: -50 }}
+                transition={{ type: "spring", damping: 15 }}
+                className="bg-white dark:bg-gray-800 rounded-3xl p-10 shadow-2xl text-center max-w-sm border-4 border-yellow-400"
+              >
+                <motion.div
+                  animate={{ 
+                    scale: [1, 1.2, 1],
+                    rotate: [0, 360]
+                  }}
+                  transition={{ duration: 0.8 }}
+                  className="w-24 h-24 mx-auto mb-6 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full flex items-center justify-center shadow-lg"
+                >
+                  <span className="text-5xl font-bold text-white">{newLevel}</span>
+                </motion.div>
+                <motion.h2
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.3 }}
+                  className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent mb-2"
+                >
+                  LEVEL UP!
+                </motion.h2>
+                <motion.p
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.5 }}
+                  className="text-muted-foreground"
+                >
+                  You reached Level {newLevel}!
+                </motion.p>
+              </motion.div>
             </motion.div>
           )}
         </AnimatePresence>

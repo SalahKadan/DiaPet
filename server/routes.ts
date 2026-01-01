@@ -7,6 +7,30 @@ import { setupAuth, registerAuthRoutes } from "./replit_integrations/auth";
 import { registerChatRoutes } from "./replit_integrations/chat";
 import { registerImageRoutes } from "./replit_integrations/image";
 
+// Challenge templates with stat effects
+const challengeTemplates = [
+  {
+    id: "hypo",
+    desc: "Oh no! Your buddy's blood sugar dropped too low after playing! They feel dizzy and weak. Give them some food to raise their blood sugar!",
+    effects: { bloodSugar: -60, health: -15, energy: -10 }
+  },
+  {
+    id: "hyper", 
+    desc: "Yikes! Your buddy ate too many sweets at a party! Their blood sugar is way too high. They need insulin to bring it down!",
+    effects: { bloodSugar: 80, health: -20 }
+  },
+  {
+    id: "hungry",
+    desc: "Your buddy's tummy is rumbling loudly! They haven't eaten in a while and feel weak. Feed them something healthy!",
+    effects: { hunger: -40, health: -10, energy: -15 }
+  },
+  {
+    id: "tired",
+    desc: "Your buddy stayed up way too late! They're exhausted and their body isn't working well. They need rest or a snack!",
+    effects: { energy: -50, bloodSugar: 20, health: -10 }
+  }
+];
+
 export async function registerRoutes(
   httpServer: Server,
   app: Express
@@ -141,16 +165,25 @@ export async function registerRoutes(
           updates.mood = "happy";
           updates.bloodSugar = Math.max(0, pet.bloodSugar - 5);
           
-          // Randomly trigger a scenario when playing
-          if (Math.random() > 0.7 && !pet.activeScenario) {
-            const scenarios = [
-              { id: "sport", desc: "Your buddy just finished a big soccer game! Exercise can make blood sugar go down. Let's check!" },
-              { id: "party", desc: "Oh no! Your buddy ate a hidden cupcake at a party. Sugary treats make blood sugar go up! Check it now!" },
-              { id: "nap", desc: "A long nap can sometimes change how our body uses energy. Time for a quick check-in!" }
-            ];
-            const sc = scenarios[Math.floor(Math.random() * scenarios.length)];
-            updates.activeScenario = sc.id;
-            updates.scenarioDescription = sc.desc;
+          // Trigger a challenge with stat effects when playing (if no active challenge)
+          if (!pet.activeScenario) {
+            const challenge = challengeTemplates[Math.floor(Math.random() * challengeTemplates.length)];
+            updates.activeScenario = challenge.id;
+            updates.scenarioDescription = challenge.desc;
+            
+            // Apply stat effects from the challenge
+            if (challenge.effects.bloodSugar) {
+              updates.bloodSugar = Math.max(0, Math.min(300, (updates.bloodSugar ?? pet.bloodSugar) + challenge.effects.bloodSugar));
+            }
+            if (challenge.effects.health) {
+              updates.health = Math.max(0, Math.min(100, pet.health + challenge.effects.health));
+            }
+            if (challenge.effects.hunger) {
+              updates.hunger = Math.max(0, Math.min(100, pet.hunger + challenge.effects.hunger));
+            }
+            if (challenge.effects.energy) {
+              updates.energy = Math.max(0, Math.min(100, (updates.energy ?? pet.energy) + challenge.effects.energy));
+            }
           }
           break;
       }
@@ -208,23 +241,21 @@ export async function registerRoutes(
     }
 
     const updates: any = {};
-    // Solving diabetes scenarios or just a regular check
-    // If there's an active scenario, completing it gives more XP
-    const xpGain = pet.activeScenario ? 50 : 10;
+    // Blood test gives a small amount of XP
+    const xpGain = 10;
     let newExp = pet.experience + xpGain;
     let newLevel = pet.level;
+    const levelThreshold = 100 + (pet.level - 1) * 25;
 
-    if (newExp >= 100) {
+    if (newExp >= levelThreshold) {
       newLevel += 1;
-      newExp -= 100;
+      newExp = newExp - levelThreshold;
     }
 
     updates.experience = newExp;
     updates.level = newLevel;
     updates.coins = (pet.coins || 0) + 1;
     updates.lastBloodTest = now;
-    updates.activeScenario = null;
-    updates.scenarioDescription = null;
 
     const updatedPet = await storage.updatePet(petId, updates);
     res.json({ 
@@ -244,19 +275,57 @@ export async function registerRoutes(
       return;
     }
 
-    // Check if all conditions are good for auto-healing
+    // Check if all conditions are good (pet is stabilized)
     const isBloodSugarGood = pet.bloodSugar >= 70 && pet.bloodSugar <= 180;
-    const isNotHungry = pet.hunger >= 40;
-    const isNotTired = pet.energy >= 30;
+    const isNotHungry = pet.hunger >= 50;
+    const isNotTired = pet.energy >= 40;
+    const isStabilized = isBloodSugarGood && isNotHungry && isNotTired;
     const needsHealing = pet.health < 100;
 
-    if (isBloodSugarGood && isNotHungry && isNotTired && needsHealing) {
+    const updates: any = {};
+    let leveledUp = false;
+    let challengeCompleted = false;
+
+    // If pet has an active challenge and is now stabilized, complete the challenge!
+    if (pet.activeScenario && isStabilized) {
+      challengeCompleted = true;
+      
+      // Award XP for completing the challenge
+      const xpGain = 40;
+      let newExp = pet.experience + xpGain;
+      let newLevel = pet.level;
+      const levelThreshold = 100 + (pet.level - 1) * 25;
+
+      if (newExp >= levelThreshold) {
+        newLevel += 1;
+        newExp = newExp - levelThreshold;
+        leveledUp = true;
+      }
+
+      updates.experience = newExp;
+      updates.level = newLevel;
+      updates.coins = (pet.coins || 0) + 5; // Bonus coins for challenge completion
+      updates.activeScenario = null;
+      updates.scenarioDescription = null;
+    }
+
+    // Auto-heal if stabilized
+    if (isStabilized && needsHealing) {
       const healAmount = 5;
-      const newHealth = Math.min(100, pet.health + healAmount);
-      const updatedPet = await storage.updatePet(petId, { health: newHealth });
-      res.json({ healed: true, pet: updatedPet });
+      updates.health = Math.min(100, pet.health + healAmount);
+    }
+
+    if (Object.keys(updates).length > 0) {
+      const updatedPet = await storage.updatePet(petId, updates);
+      res.json({ 
+        healed: needsHealing && isStabilized, 
+        challengeCompleted,
+        leveledUp,
+        newLevel: leveledUp ? updates.level : pet.level,
+        pet: updatedPet 
+      });
     } else {
-      res.json({ healed: false, pet });
+      res.json({ healed: false, challengeCompleted: false, leveledUp: false, pet });
     }
   });
 
