@@ -97,15 +97,15 @@ export function PetAvatar({ pet, className }: PetAvatarProps) {
           <ellipse cx="70" cy="160" rx="12" ry="8" fill="url(#ragdollFurShadow)" opacity="0.5"/>
           <ellipse cx="130" cy="160" rx="12" ry="8" fill="url(#ragdollFurShadow)" opacity="0.5"/>
 
-          <path d="M30 90 L48 40 L62 72 Z" fill="url(#ragdollFur)" stroke="url(#ragdollFurShadow)" strokeWidth="1"/>
-          <path d="M170 90 L152 40 L138 72 Z" fill="url(#ragdollFur)" stroke="url(#ragdollFurShadow)" strokeWidth="1"/>
-          <path d="M40 78 L48 52 L55 72 Z" fill="#FFCDD2"/>
-          <path d="M160 78 L152 52 L145 72 Z" fill="#FFCDD2"/>
+          <path d="M35 85 Q30 55 50 45 Q65 50 60 75 Q55 85 45 88 Z" fill="url(#ragdollFur)" stroke="url(#ragdollFurShadow)" strokeWidth="1"/>
+          <path d="M165 85 Q170 55 150 45 Q135 50 140 75 Q145 85 155 88 Z" fill="url(#ragdollFur)" stroke="url(#ragdollFurShadow)" strokeWidth="1"/>
+          <path d="M42 78 Q40 62 50 55 Q58 60 55 75 Z" fill="#FFCDD2"/>
+          <path d="M158 78 Q160 62 150 55 Q142 60 145 75 Z" fill="#FFCDD2"/>
           
-          <ellipse cx="32" cy="75" rx="8" ry="6" fill="url(#ragdollFur)" opacity="0.8"/>
-          <ellipse cx="168" cy="75" rx="8" ry="6" fill="url(#ragdollFur)" opacity="0.8"/>
-          <ellipse cx="28" cy="85" rx="6" ry="5" fill="url(#ragdollFur)" opacity="0.6"/>
-          <ellipse cx="172" cy="85" rx="6" ry="5" fill="url(#ragdollFur)" opacity="0.6"/>
+          <ellipse cx="30" cy="78" rx="6" ry="5" fill="url(#ragdollFur)" opacity="0.8"/>
+          <ellipse cx="170" cy="78" rx="6" ry="5" fill="url(#ragdollFur)" opacity="0.8"/>
+          <ellipse cx="26" cy="86" rx="5" ry="4" fill="url(#ragdollFur)" opacity="0.6"/>
+          <ellipse cx="174" cy="86" rx="5" ry="4" fill="url(#ragdollFur)" opacity="0.6"/>
 
           <ellipse cx="100" cy="100" rx="60" ry="55" fill="url(#ragdollFur)" filter="url(#softShadow)" />
           
