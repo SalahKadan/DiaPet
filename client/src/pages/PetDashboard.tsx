@@ -146,24 +146,24 @@ export function PetDashboard({ pet }: PetDashboardProps) {
 
         <div className="flex-1 flex flex-col items-center justify-center relative bg-gradient-to-b from-primary/5 to-transparent pt-8">
           <div className="relative w-full px-8">
-            <AnimatePresence>
-              {showChallenge && pet.activeScenario && (
-                <motion.div
-                  initial={{ opacity: 0, y: 20, scale: 0.8 }}
-                  animate={{ opacity: 1, y: 0, scale: 1 }}
-                  exit={{ opacity: 0, y: -10, scale: 0.9 }}
-                  transition={{ type: "spring", damping: 20, stiffness: 300 }}
-                  className="absolute -top-4 left-1/2 -translate-x-1/2 z-30 w-[85%] max-w-[280px]"
-                >
-                  <div className="bg-primary text-primary-foreground rounded-2xl p-4 shadow-xl relative">
-                    <p className="text-xs uppercase tracking-widest mb-1 opacity-80">New Challenge!</p>
-                    <p className="text-sm font-medium leading-relaxed">{pet.scenarioDescription || "Something is happening! Check your sugar levels."}</p>
-                    <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-4 h-4 bg-primary rotate-45" />
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-            <motion.div initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="pt-16">
+            <motion.div initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="relative">
+              <AnimatePresence>
+                {showChallenge && pet.activeScenario && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 20, scale: 0.8 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: -10, scale: 0.9 }}
+                    transition={{ type: "spring", damping: 20, stiffness: 300 }}
+                    className="absolute -top-20 left-1/2 -translate-x-1/2 z-30 w-[90%] max-w-[260px]"
+                  >
+                    <div className="bg-primary text-primary-foreground rounded-2xl p-3 shadow-xl relative">
+                      <p className="text-[10px] uppercase tracking-widest mb-1 opacity-80">New Challenge!</p>
+                      <p className="text-xs font-medium leading-relaxed">{pet.scenarioDescription || "Something is happening! Check your sugar levels."}</p>
+                      <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-4 h-4 bg-primary rotate-45" />
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
               <PetAvatar pet={pet} className="w-full max-w-[280px] mx-auto drop-shadow-[0_0_50px_rgba(59,130,246,0.3)]" />
             </motion.div>
           </div>
