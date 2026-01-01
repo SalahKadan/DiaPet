@@ -10,7 +10,6 @@ interface PetAvatarProps {
 export function PetAvatar({ pet, className }: PetAvatarProps) {
   const isDistressed = pet.bloodSugar < 70 || pet.bloodSugar > 180;
   const isLowEnergy = pet.energy < 30;
-  const isHungry = pet.hunger < 55;
   const isUnhealthy = pet.health < 40;
 
   const bounce = {
@@ -46,7 +45,6 @@ export function PetAvatar({ pet, className }: PetAvatarProps) {
     if (pet.isAsleep) return "sleeping";
     if (isDistressed) return "worried";
     if (isUnhealthy) return "sad";
-    if (isHungry) return "hungry";
     if (isLowEnergy) return "tired";
     if (pet.mood === "happy") return "happy";
     return "normal";
@@ -171,15 +169,6 @@ export function PetAvatar({ pet, className }: PetAvatarProps) {
                   <path d="M55 80 Q70 86 85 80" stroke="#8B7355" strokeWidth="2" strokeLinecap="round" fill="none"/>
                   <path d="M115 80 Q130 86 145 80" stroke="#8B7355" strokeWidth="2" strokeLinecap="round" fill="none"/>
                 </>
-              ) : eyeExpression === "hungry" ? (
-                <>
-                  <ellipse cx="70" cy="90" rx="13" ry="16" fill="url(#blueEyes)" />
-                  <ellipse cx="130" cy="90" rx="13" ry="16" fill="url(#blueEyes)" />
-                  <ellipse cx="67" cy="85" rx="5" ry="6" fill="white" />
-                  <ellipse cx="127" cy="85" rx="5" ry="6" fill="white" />
-                  <circle cx="73" cy="94" r="3" fill="white" opacity="0.4"/>
-                  <circle cx="133" cy="94" r="3" fill="white" opacity="0.4"/>
-                </>
               ) : eyeExpression === "tired" ? (
                 <>
                   <ellipse cx="70" cy="92" rx="9" ry="11" fill="url(#blueEyes)" />
@@ -207,7 +196,7 @@ export function PetAvatar({ pet, className }: PetAvatarProps) {
 
           {eyeExpression !== "sleeping" && (
             <path 
-              d={eyeExpression === "happy" || eyeExpression === "hungry" 
+              d={eyeExpression === "happy" 
                 ? "M88 126 Q100 138 112 126" 
                 : eyeExpression === "worried" || eyeExpression === "sad"
                 ? "M90 132 Q100 126 110 132"
