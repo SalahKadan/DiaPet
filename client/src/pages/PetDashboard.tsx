@@ -32,6 +32,7 @@ export function PetDashboard({ pet }: PetDashboardProps) {
   const [chatHistory, setChatHistory] = useState<{role: 'user'|'pet', text: string}[]>([]);
   const [showChallenge, setShowChallenge] = useState(false);
   const lastScenarioRef = useRef<string | null>(null);
+  const challengeIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     if (pet.activeScenario && pet.activeScenario !== lastScenarioRef.current) {
@@ -46,6 +47,49 @@ export function PetDashboard({ pet }: PetDashboardProps) {
       setShowChallenge(false);
     }
   }, [pet.activeScenario]);
+
+  useEffect(() => {
+    challengeIntervalRef.current = setInterval(() => {
+      if (!pet.isAsleep) {
+        handleActionMutation.mutate({ id: pet.id, type: 'play' });
+      }
+    }, 120000);
+    return () => {
+      if (challengeIntervalRef.current) {
+        clearInterval(challengeIntervalRef.current);
+      }
+    };
+  }, [pet.id, pet.isAsleep]);
+
+  const getCareInstructions = () => {
+    const instructions: string[] = [];
+    const isBloodSugarLow = pet.bloodSugar < 70;
+    const isBloodSugarHigh = pet.bloodSugar > 180;
+    const isHungry = pet.hunger < 40;
+    const isTired = pet.energy < 30;
+    const isUnhealthy = pet.health < 50;
+
+    if (isBloodSugarLow) {
+      instructions.push("My blood sugar is too low! Give me a snack to bring it up.");
+    }
+    if (isBloodSugarHigh) {
+      instructions.push("My blood sugar is too high! I need some insulin to bring it down.");
+    }
+    if (isHungry && !isBloodSugarHigh) {
+      instructions.push("I'm getting hungry! Feed me something yummy.");
+    }
+    if (isTired) {
+      instructions.push("I'm feeling tired. Let me take a nap to restore my energy.");
+    }
+    if (isUnhealthy && !isBloodSugarLow && !isBloodSugarHigh) {
+      instructions.push("My health is low. Keep my blood sugar balanced to help me feel better!");
+    }
+    
+    return instructions;
+  };
+
+  const careInstructions = getCareInstructions();
+  const isPetGood = careInstructions.length === 0;
 
   const nameMutation = useMutation({
     mutationFn: async (name: string) => {
@@ -154,12 +198,16 @@ export function PetDashboard({ pet }: PetDashboardProps) {
                     animate={{ opacity: 1, y: 0, scale: 1 }}
                     exit={{ opacity: 0, y: -10, scale: 0.9 }}
                     transition={{ type: "spring", damping: 20, stiffness: 300 }}
-                    className="absolute -top-20 left-1/2 -translate-x-1/2 z-30 w-[90%] max-w-[260px]"
+                    className="absolute -top-24 left-1/2 -translate-x-1/2 z-30 w-[95%] max-w-[280px]"
                   >
-                    <div className="bg-primary text-primary-foreground rounded-2xl p-3 shadow-xl relative">
-                      <p className="text-[10px] uppercase tracking-widest mb-1 opacity-80">New Challenge!</p>
-                      <p className="text-xs font-medium leading-relaxed">{pet.scenarioDescription || "Something is happening! Check your sugar levels."}</p>
-                      <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-4 h-4 bg-primary rotate-45" />
+                    <div className="bg-white dark:bg-white text-gray-800 rounded-[24px] p-4 shadow-lg relative border border-gray-100">
+                      <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 flex gap-1">
+                        <div className="w-4 h-4 bg-white dark:bg-white rounded-full shadow-sm border border-gray-100" />
+                        <div className="w-2.5 h-2.5 bg-white dark:bg-white rounded-full shadow-sm border border-gray-100 mt-2" />
+                        <div className="w-1.5 h-1.5 bg-white dark:bg-white rounded-full shadow-sm border border-gray-100 mt-3" />
+                      </div>
+                      <p className="text-[10px] uppercase tracking-widest mb-1 text-blue-500 font-semibold">New Challenge!</p>
+                      <p className="text-sm font-medium leading-relaxed">{pet.scenarioDescription || "Something is happening! Check your sugar levels."}</p>
                     </div>
                   </motion.div>
                 )}
@@ -168,13 +216,40 @@ export function PetDashboard({ pet }: PetDashboardProps) {
             </motion.div>
           </div>
           
-          <div className="mt-8 text-center px-6">
+          <div className="mt-6 text-center px-6">
             <h2 className="text-2xl font-display font-bold text-primary mb-2">{pet.name}</h2>
-            <div className="bg-muted/50 backdrop-blur-sm rounded-2xl p-4 border border-white/5 min-h-[80px] flex items-center justify-center shadow-inner">
-              <p className="text-sm italic text-muted-foreground leading-relaxed">
-                {pet.activeScenario ? pet.scenarioDescription : "I'm feeling good! Ready to play?"}
-              </p>
-            </div>
+            <AnimatePresence mode="wait">
+              {!isPetGood ? (
+                <motion.div
+                  key="instructions"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  className="bg-amber-50 dark:bg-amber-900/30 backdrop-blur-sm rounded-2xl p-3 border border-amber-200 dark:border-amber-700/50 shadow-inner"
+                >
+                  <p className="text-[10px] uppercase tracking-widest text-amber-600 dark:text-amber-400 font-semibold mb-2">How to help me:</p>
+                  <div className="space-y-1.5">
+                    {careInstructions.map((instruction, index) => (
+                      <p key={index} className="text-xs text-amber-800 dark:text-amber-200 leading-relaxed">
+                        {instruction}
+                      </p>
+                    ))}
+                  </div>
+                </motion.div>
+              ) : (
+                <motion.div
+                  key="happy"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  className="bg-green-50 dark:bg-green-900/30 backdrop-blur-sm rounded-2xl p-3 border border-green-200 dark:border-green-700/50 shadow-inner"
+                >
+                  <p className="text-sm text-green-700 dark:text-green-300 leading-relaxed">
+                    I'm feeling great! Keep up the good work!
+                  </p>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
 
           <div className="mt-8 px-6 flex justify-around items-center w-full max-w-[320px] gap-4">
