@@ -173,6 +173,8 @@ export function PetDashboard({ pet }: PetDashboardProps) {
     }
   });
 
+  const [bloodTestMessage, setBloodTestMessage] = useState<string | null>(null);
+
   const bloodTestMutation = useMutation({
     mutationFn: async () => {
       const res = await apiRequest("POST", `/api/pets/${pet.id}/blood-test`);
@@ -181,28 +183,38 @@ export function PetDashboard({ pet }: PetDashboardProps) {
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["/api/pets"] });
       if (data.success) {
+        setBloodTestPhase('reward');
         setEarnedCoin(true);
-        setTimeout(() => setEarnedCoin(false), 2000);
+        setBloodTestMessage("Great job! You earned a coin!");
+        setTimeout(() => {
+          setEarnedCoin(false);
+          setShowBloodTestAnimation(false);
+          setBloodTestPhase('idle');
+          setBloodTestMessage(null);
+        }, 2000);
+      } else if (data.cooldown) {
+        setBloodTestMessage(`Please wait ${data.remainingSeconds || 0} seconds before testing again.`);
+        setTimeout(() => {
+          setShowBloodTestAnimation(false);
+          setBloodTestPhase('idle');
+          setBloodTestMessage(null);
+        }, 2000);
       }
       setBloodTestOpen(false);
     }
   });
 
   const startBloodTest = () => {
-    if (cooldownRemaining > 0) return;
+    if (cooldownRemaining > 0 || bloodTestMutation.isPending) return;
     setShowBloodTestAnimation(true);
     setBloodTestPhase('finger');
+    setBloodTestMessage(null);
     
     setTimeout(() => setBloodTestPhase('testing'), 1000);
-    setTimeout(() => setBloodTestPhase('result'), 2500);
     setTimeout(() => {
-      setBloodTestPhase('reward');
+      setBloodTestPhase('result');
       bloodTestMutation.mutate();
-    }, 3500);
-    setTimeout(() => {
-      setShowBloodTestAnimation(false);
-      setBloodTestPhase('idle');
-    }, 5000);
+    }, 2500);
   };
 
   const handleActionMutation = useMutation({
@@ -358,18 +370,18 @@ export function PetDashboard({ pet }: PetDashboardProps) {
                 </motion.div>
 
                 <motion.p
-                  key={bloodTestPhase}
+                  key={bloodTestPhase + (bloodTestMessage || '')}
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   className="text-lg font-medium text-foreground"
                 >
                   {bloodTestPhase === 'finger' && "Placing finger on sensor..."}
                   {bloodTestPhase === 'testing' && "Testing blood sugar..."}
-                  {bloodTestPhase === 'result' && `Blood sugar: ${pet.bloodSugar} mg/dL`}
-                  {bloodTestPhase === 'reward' && "Great job! You earned a coin!"}
+                  {bloodTestPhase === 'result' && (bloodTestMutation.isPending ? `Blood sugar: ${pet.bloodSugar} mg/dL` : (bloodTestMessage || `Blood sugar: ${pet.bloodSugar} mg/dL`))}
+                  {bloodTestPhase === 'reward' && bloodTestMessage}
                 </motion.p>
 
-                {bloodTestPhase === 'reward' && (
+                {bloodTestPhase === 'reward' && earnedCoin && (
                   <motion.div
                     initial={{ scale: 0 }}
                     animate={{ scale: 1 }}
