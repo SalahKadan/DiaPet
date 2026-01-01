@@ -10,7 +10,7 @@ interface PetAvatarProps {
 export function PetAvatar({ pet, className }: PetAvatarProps) {
   const isDistressed = pet.bloodSugar < 70 || pet.bloodSugar > 180;
   const isLowEnergy = pet.energy < 30;
-  const isHungry = pet.hunger > 80;
+  const isHungry = pet.hunger <= 55;
   const isUnhealthy = pet.health < 40;
 
   const bounce = {
