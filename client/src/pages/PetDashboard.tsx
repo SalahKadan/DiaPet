@@ -87,6 +87,25 @@ export function PetDashboard({ pet }: PetDashboardProps) {
     return () => clearInterval(healInterval);
   }, [pet.id, isPetGood, pet.health]);
 
+  const tickMutation = useMutation({
+    mutationFn: async () => {
+      const res = await apiRequest("POST", `/api/pets/${pet.id}/tick`);
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/pets"] });
+    }
+  });
+
+  useEffect(() => {
+    const tickInterval = setInterval(() => {
+      if (!pet.isAsleep) {
+        tickMutation.mutate();
+      }
+    }, 15000);
+    return () => clearInterval(tickInterval);
+  }, [pet.id, pet.isAsleep]);
+
   const getCareInstructions = () => {
     const instructions: string[] = [];
     const isBloodSugarLow = pet.bloodSugar < 70;

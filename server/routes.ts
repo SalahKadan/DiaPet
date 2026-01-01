@@ -235,6 +235,35 @@ export async function registerRoutes(
     }
   });
 
+  app.post("/api/pets/:id/tick", async (req, res) => {
+    const petId = Number(req.params.id);
+    const pet = await storage.getPet(petId);
+    
+    if (!pet) {
+      res.status(404).json({ message: "Pet not found" });
+      return;
+    }
+
+    const updates: any = {};
+    
+    // Decrease hunger by 5 every tick (called every 15 seconds)
+    if (!pet.isAsleep && pet.hunger > 0) {
+      updates.hunger = Math.max(0, pet.hunger - 5);
+    }
+    
+    // Decrease energy slowly when awake
+    if (!pet.isAsleep && pet.energy > 0) {
+      updates.energy = Math.max(0, pet.energy - 2);
+    }
+
+    if (Object.keys(updates).length > 0) {
+      const updatedPet = await storage.updatePet(petId, updates);
+      res.json(updatedPet);
+    } else {
+      res.json(pet);
+    }
+  });
+
   app.get(api.foods.list.path, async (req, res) => {
     const foods = await storage.getFoods();
     res.json(foods);
