@@ -61,6 +61,32 @@ export function PetDashboard({ pet }: PetDashboardProps) {
     };
   }, [pet.id, pet.isAsleep]);
 
+  const isBloodSugarGood = pet.bloodSugar >= 70 && pet.bloodSugar <= 180;
+  const isNotHungry = pet.hunger >= 40;
+  const isNotTired = pet.energy >= 30;
+  const isPetGood = isBloodSugarGood && isNotHungry && isNotTired;
+
+  const autoHealMutation = useMutation({
+    mutationFn: async () => {
+      const res = await apiRequest("POST", `/api/pets/${pet.id}/auto-heal`);
+      return res.json();
+    },
+    onSuccess: (data) => {
+      if (data.healed) {
+        queryClient.invalidateQueries({ queryKey: ["/api/pets"] });
+      }
+    }
+  });
+
+  useEffect(() => {
+    const healInterval = setInterval(() => {
+      if (isPetGood && pet.health < 100) {
+        autoHealMutation.mutate();
+      }
+    }, 30000);
+    return () => clearInterval(healInterval);
+  }, [pet.id, isPetGood, pet.health]);
+
   const getCareInstructions = () => {
     const instructions: string[] = [];
     const isBloodSugarLow = pet.bloodSugar < 70;
@@ -95,7 +121,6 @@ export function PetDashboard({ pet }: PetDashboardProps) {
   };
 
   const careInstructions = getCareInstructions();
-  const isPetGood = careInstructions.length === 0;
 
   const nameMutation = useMutation({
     mutationFn: async (name: string) => {

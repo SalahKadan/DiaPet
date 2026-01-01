@@ -210,6 +210,31 @@ export async function registerRoutes(
     res.json(updatedPet);
   });
 
+  app.post("/api/pets/:id/auto-heal", async (req, res) => {
+    const petId = Number(req.params.id);
+    const pet = await storage.getPet(petId);
+    
+    if (!pet) {
+      res.status(404).json({ message: "Pet not found" });
+      return;
+    }
+
+    // Check if all conditions are good for auto-healing
+    const isBloodSugarGood = pet.bloodSugar >= 70 && pet.bloodSugar <= 180;
+    const isNotHungry = pet.hunger >= 40;
+    const isNotTired = pet.energy >= 30;
+    const needsHealing = pet.health < 100;
+
+    if (isBloodSugarGood && isNotHungry && isNotTired && needsHealing) {
+      const healAmount = 5;
+      const newHealth = Math.min(100, pet.health + healAmount);
+      const updatedPet = await storage.updatePet(petId, { health: newHealth });
+      res.json({ healed: true, pet: updatedPet });
+    } else {
+      res.json({ healed: false, pet });
+    }
+  });
+
   app.get(api.foods.list.path, async (req, res) => {
     const foods = await storage.getFoods();
     res.json(foods);
