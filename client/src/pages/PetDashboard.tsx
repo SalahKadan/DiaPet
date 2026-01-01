@@ -7,7 +7,7 @@ import { InsulinControl } from "@/components/InsulinControl";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { Heart, Zap, Utensils, Moon, Sun, MessageCircle, Activity, Stethoscope, Gamepad2, Syringe } from "lucide-react";
+import { Heart, Zap, Utensils, Moon, Sun, MessageCircle, Activity, Stethoscope, Gamepad2, Syringe, Coins, Clock } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useMutation } from "@tanstack/react-query";
@@ -31,8 +31,29 @@ export function PetDashboard({ pet }: PetDashboardProps) {
   const [chatInput, setChatInput] = useState("");
   const [chatHistory, setChatHistory] = useState<{role: 'user'|'pet', text: string}[]>([]);
   const [showChallenge, setShowChallenge] = useState(false);
+  const [cooldownRemaining, setCooldownRemaining] = useState(0);
+  const [showBloodTestAnimation, setShowBloodTestAnimation] = useState(false);
+  const [bloodTestPhase, setBloodTestPhase] = useState<'idle' | 'finger' | 'testing' | 'result' | 'reward'>('idle');
+  const [earnedCoin, setEarnedCoin] = useState(false);
   const lastScenarioRef = useRef<string | null>(null);
   const challengeIntervalRef = useRef<NodeJS.Timeout | null>(null);
+
+  useEffect(() => {
+    if (pet.lastBloodTest) {
+      const updateCooldown = () => {
+        const lastTest = new Date(pet.lastBloodTest!);
+        const now = new Date();
+        const elapsed = (now.getTime() - lastTest.getTime()) / 1000;
+        const remaining = Math.max(0, 60 - elapsed);
+        setCooldownRemaining(Math.ceil(remaining));
+      };
+      updateCooldown();
+      const interval = setInterval(updateCooldown, 1000);
+      return () => clearInterval(interval);
+    } else {
+      setCooldownRemaining(0);
+    }
+  }, [pet.lastBloodTest]);
 
   useEffect(() => {
     if (pet.activeScenario && pet.activeScenario !== lastScenarioRef.current) {
@@ -157,11 +178,32 @@ export function PetDashboard({ pet }: PetDashboardProps) {
       const res = await apiRequest("POST", `/api/pets/${pet.id}/blood-test`);
       return res.json();
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["/api/pets"] });
+      if (data.success) {
+        setEarnedCoin(true);
+        setTimeout(() => setEarnedCoin(false), 2000);
+      }
       setBloodTestOpen(false);
     }
   });
+
+  const startBloodTest = () => {
+    if (cooldownRemaining > 0) return;
+    setShowBloodTestAnimation(true);
+    setBloodTestPhase('finger');
+    
+    setTimeout(() => setBloodTestPhase('testing'), 1000);
+    setTimeout(() => setBloodTestPhase('result'), 2500);
+    setTimeout(() => {
+      setBloodTestPhase('reward');
+      bloodTestMutation.mutate();
+    }, 3500);
+    setTimeout(() => {
+      setShowBloodTestAnimation(false);
+      setBloodTestPhase('idle');
+    }, 5000);
+  };
 
   const handleActionMutation = useMutation({
     mutationFn: async (data: any) => {
@@ -226,6 +268,121 @@ export function PetDashboard({ pet }: PetDashboardProps) {
           )}
 
                   </AnimatePresence>
+
+        <div className="absolute top-4 left-4 z-30 flex flex-col gap-1">
+          <div className="flex items-center gap-2 bg-yellow-100 dark:bg-yellow-900/50 px-3 py-1.5 rounded-full shadow-md">
+            <Coins className="w-4 h-4 text-yellow-600" />
+            <span className="text-sm font-bold text-yellow-700 dark:text-yellow-300" data-testid="text-coins">{pet.coins || 0}</span>
+            <AnimatePresence>
+              {earnedCoin && (
+                <motion.span
+                  initial={{ opacity: 0, y: 10, scale: 0.5 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  className="text-xs font-bold text-green-600"
+                >
+                  +1
+                </motion.span>
+              )}
+            </AnimatePresence>
+          </div>
+          {cooldownRemaining > 0 && (
+            <div className="flex items-center gap-2 bg-gray-100 dark:bg-gray-800 px-3 py-1 rounded-full shadow-md">
+              <Clock className="w-3 h-3 text-gray-500" />
+              <span className="text-xs font-medium text-gray-600 dark:text-gray-400" data-testid="text-cooldown">
+                {cooldownRemaining}s
+              </span>
+            </div>
+          )}
+        </div>
+
+        <AnimatePresence>
+          {showBloodTestAnimation && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="absolute inset-0 z-[90] bg-background/95 backdrop-blur-xl flex flex-col items-center justify-center p-8"
+            >
+              <div className="text-center space-y-6">
+                <motion.div
+                  animate={{ scale: bloodTestPhase === 'testing' ? [1, 1.1, 1] : 1 }}
+                  transition={{ repeat: bloodTestPhase === 'testing' ? Infinity : 0, duration: 0.5 }}
+                  className="relative"
+                >
+                  <svg viewBox="0 0 200 200" className="w-48 h-48 mx-auto">
+                    <rect x="60" y="80" width="80" height="100" rx="8" fill="#3B82F6" />
+                    <rect x="70" y="90" width="60" height="40" rx="4" fill="#1E3A8A" />
+                    <AnimatePresence mode="wait">
+                      {bloodTestPhase === 'result' || bloodTestPhase === 'reward' ? (
+                        <motion.text
+                          key="result"
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          x="100"
+                          y="118"
+                          textAnchor="middle"
+                          fill="#22C55E"
+                          fontSize="18"
+                          fontWeight="bold"
+                        >
+                          {pet.bloodSugar}
+                        </motion.text>
+                      ) : bloodTestPhase === 'testing' ? (
+                        <motion.text
+                          key="testing"
+                          x="100"
+                          y="118"
+                          textAnchor="middle"
+                          fill="#60A5FA"
+                          fontSize="14"
+                        >
+                          ...
+                        </motion.text>
+                      ) : null}
+                    </AnimatePresence>
+                    <circle cx="100" cy="160" r="12" fill="#93C5FD" />
+                    <AnimatePresence>
+                      {(bloodTestPhase === 'finger' || bloodTestPhase === 'testing') && (
+                        <motion.g
+                          initial={{ y: -30, opacity: 0 }}
+                          animate={{ y: 0, opacity: 1 }}
+                          exit={{ y: -20, opacity: 0 }}
+                        >
+                          <ellipse cx="100" cy="50" rx="15" ry="25" fill="#FEF3C7" stroke="#FCD34D" strokeWidth="2" />
+                          <circle cx="100" cy="68" r="3" fill="#EF4444" />
+                        </motion.g>
+                      )}
+                    </AnimatePresence>
+                  </svg>
+                </motion.div>
+
+                <motion.p
+                  key={bloodTestPhase}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="text-lg font-medium text-foreground"
+                >
+                  {bloodTestPhase === 'finger' && "Placing finger on sensor..."}
+                  {bloodTestPhase === 'testing' && "Testing blood sugar..."}
+                  {bloodTestPhase === 'result' && `Blood sugar: ${pet.bloodSugar} mg/dL`}
+                  {bloodTestPhase === 'reward' && "Great job! You earned a coin!"}
+                </motion.p>
+
+                {bloodTestPhase === 'reward' && (
+                  <motion.div
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    className="flex items-center justify-center gap-2"
+                  >
+                    <Coins className="w-8 h-8 text-yellow-500" />
+                    <span className="text-2xl font-bold text-yellow-600">+1</span>
+                  </motion.div>
+                )}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         <div className="pt-12 px-6 flex flex-col gap-4 z-20">
           <div className="grid grid-cols-2 gap-4">
@@ -338,7 +495,14 @@ export function PetDashboard({ pet }: PetDashboardProps) {
           <Button variant="ghost" size="icon" className="w-12 h-12 text-muted-foreground hover:text-primary hover-elevate" onClick={() => handleAction('play')} disabled={actionPending || pet.isAsleep}>
             <Gamepad2 className="w-6 h-6" />
           </Button>
-          <Button variant="ghost" size="icon" className="w-12 h-12 text-muted-foreground hover:text-primary hover-elevate" onClick={() => setBloodTestOpen(true)}>
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            className={`w-12 h-12 hover-elevate ${cooldownRemaining > 0 ? 'text-muted-foreground/50 cursor-not-allowed' : 'text-muted-foreground hover:text-primary'}`} 
+            onClick={startBloodTest}
+            disabled={cooldownRemaining > 0 || showBloodTestAnimation}
+            data-testid="button-blood-test"
+          >
             <Syringe className="w-6 h-6" />
           </Button>
           <div className="flex flex-col items-center">
