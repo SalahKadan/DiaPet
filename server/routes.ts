@@ -271,9 +271,9 @@ export async function registerRoutes(
 
     const updates: any = {};
     
-    // Decrease hunger by 5 every tick (called every 15 seconds)
+    // Decrease hunger by 2 every tick (called every 15 seconds) - slower decrease
     if (!pet.isAsleep && pet.hunger > 0) {
-      updates.hunger = Math.max(0, pet.hunger - 5);
+      updates.hunger = Math.max(0, pet.hunger - 2);
     }
     
     // Decrease energy slowly when awake
