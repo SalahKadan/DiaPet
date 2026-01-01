@@ -46,7 +46,6 @@ export function PetAvatar({ pet, className }: PetAvatarProps) {
     if (isDistressed) return "worried";
     if (isUnhealthy) return "sad";
     if (isLowEnergy) return "tired";
-    if (pet.mood === "happy") return "happy";
     return "normal";
   };
 
@@ -141,15 +140,10 @@ export function PetAvatar({ pet, className }: PetAvatarProps) {
             </>
           ) : (
             <>
-              <ellipse cx="70" cy="90" rx="18" ry={eyeExpression === "happy" ? 12 : 20} fill="white" stroke="#E8E0D8" strokeWidth="1" />
-              <ellipse cx="130" cy="90" rx="18" ry={eyeExpression === "happy" ? 12 : 20} fill="white" stroke="#E8E0D8" strokeWidth="1" />
+              <ellipse cx="70" cy="90" rx="18" ry="20" fill="white" stroke="#E8E0D8" strokeWidth="1" />
+              <ellipse cx="130" cy="90" rx="18" ry="20" fill="white" stroke="#E8E0D8" strokeWidth="1" />
 
-              {eyeExpression === "happy" ? (
-                <>
-                  <path d="M56 88 Q70 98 84 88" stroke="url(#blueEyes)" strokeWidth="4" strokeLinecap="round" fill="none"/>
-                  <path d="M116 88 Q130 98 144 88" stroke="url(#blueEyes)" strokeWidth="4" strokeLinecap="round" fill="none"/>
-                </>
-              ) : eyeExpression === "worried" ? (
+              {eyeExpression === "worried" ? (
                 <>
                   <ellipse cx="70" cy="92" rx="11" ry="14" fill="url(#blueEyes)" />
                   <ellipse cx="130" cy="92" rx="11" ry="14" fill="url(#blueEyes)" />
@@ -196,9 +190,7 @@ export function PetAvatar({ pet, className }: PetAvatarProps) {
 
           {eyeExpression !== "sleeping" && (
             <path 
-              d={eyeExpression === "happy" 
-                ? "M88 126 Q100 138 112 126" 
-                : eyeExpression === "worried" || eyeExpression === "sad"
+              d={eyeExpression === "worried" || eyeExpression === "sad"
                 ? "M90 132 Q100 126 110 132"
                 : "M90 128 Q100 132 110 128"
               } 
