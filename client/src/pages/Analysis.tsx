@@ -7,8 +7,10 @@ import { motion } from "framer-motion";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Area, AreaChart, Legend } from "recharts";
 import { apiRequest } from "@/lib/queryClient";
 import { useState } from "react";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 export default function Analysis() {
+  const { t, isRTL } = useLanguage();
   const [recommendations, setRecommendations] = useState<string[]>([]);
   const [isLoadingRecs, setIsLoadingRecs] = useState(false);
 
@@ -43,7 +45,7 @@ export default function Analysis() {
     }
 
     history.push({
-      time: "Now",
+      time: t.analysis.now,
       bloodSugar: pet.bloodSugar,
       health: pet.health,
       hunger: pet.hunger,
@@ -61,7 +63,7 @@ export default function Analysis() {
       const data = await res.json();
       setRecommendations(data.recommendations || []);
     } catch (error) {
-      setRecommendations(["Unable to generate recommendations at this time."]);
+      setRecommendations([t.analysis.unableToGenerate]);
     }
     setIsLoadingRecs(false);
   };
@@ -69,7 +71,7 @@ export default function Analysis() {
   if (isLoading) {
     return (
       <div className="h-screen bg-gradient-to-b from-gray-900 to-gray-950 flex items-center justify-center">
-        <div className="animate-pulse text-blue-400">Loading analysis...</div>
+        <div className="animate-pulse text-blue-400">{t.analysis.loadingAnalysis}</div>
       </div>
     );
   }
@@ -77,7 +79,7 @@ export default function Analysis() {
   if (!pet) {
     return (
       <div className="h-screen bg-gradient-to-b from-gray-900 to-gray-950 flex items-center justify-center">
-        <p className="text-gray-400">No pet found</p>
+        <p className="text-gray-400">{t.analysis.noPetFound}</p>
       </div>
     );
   }
@@ -97,9 +99,9 @@ export default function Analysis() {
 
   const getTrend = (current: number, avg: number) => {
     const diff = current - avg;
-    if (diff > 5) return { icon: TrendingUp, color: "text-green-500", text: "Rising" };
-    if (diff < -5) return { icon: TrendingDown, color: "text-red-500", text: "Falling" };
-    return { icon: Minus, color: "text-gray-500", text: "Stable" };
+    if (diff > 5) return { icon: TrendingUp, color: "text-green-500", text: t.analysis.rising };
+    if (diff < -5) return { icon: TrendingDown, color: "text-red-500", text: t.analysis.falling };
+    return { icon: Minus, color: "text-gray-500", text: t.analysis.stable };
   };
 
   const avgBloodSugar = Math.round(history.reduce((a, b) => a + b.bloodSugar, 0) / history.length);
@@ -108,13 +110,13 @@ export default function Analysis() {
   const BloodSugarTrendIcon = bloodSugarTrend.icon;
 
   return (
-    <div className="h-screen overflow-y-auto bg-gradient-to-b from-gray-900 to-gray-950 p-4 pb-24">
+    <div className="h-screen overflow-y-auto bg-gradient-to-b from-gray-900 to-gray-950 p-4 pb-24" dir={isRTL ? 'rtl' : 'ltr'}>
       <div className="max-w-lg mx-auto space-y-6">
         <div className="flex items-center gap-4">
           <Button variant="ghost" size="icon" onClick={() => window.location.href = "/pet"} className="text-gray-300 hover:text-white" data-testid="button-back">
-            <ArrowLeft className="w-5 h-5" />
+            <ArrowLeft className={`w-5 h-5 ${isRTL ? 'rotate-180' : ''}`} />
           </Button>
-          <h1 className="text-2xl font-display font-bold text-blue-400">Health Analysis</h1>
+          <h1 className="text-2xl font-display font-bold text-blue-400">{t.analysis.title}</h1>
         </div>
 
         <motion.div
@@ -126,12 +128,12 @@ export default function Analysis() {
             <CardContent className="p-4">
               <div className="flex items-center gap-2 mb-2">
                 <Heart className="w-4 h-4 text-pink-400" />
-                <span className="text-xs text-gray-400">Health</span>
+                <span className="text-xs text-gray-400">{t.analysis.health}</span>
               </div>
               <div className={`text-2xl font-bold ${getStatusColor(pet.health, 'stat')}`}>
                 {pet.health}%
               </div>
-              <div className="text-xs text-gray-500">Avg: {avgHealth}%</div>
+              <div className="text-xs text-gray-500">{t.analysis.avg}: {avgHealth}%</div>
             </CardContent>
           </Card>
 
@@ -139,7 +141,7 @@ export default function Analysis() {
             <CardContent className="p-4">
               <div className="flex items-center gap-2 mb-2">
                 <Activity className="w-4 h-4 text-red-400" />
-                <span className="text-xs text-gray-400">Blood Sugar</span>
+                <span className="text-xs text-gray-400">{t.analysis.bloodSugar}</span>
               </div>
               <div className={`text-2xl font-bold ${getStatusColor(pet.bloodSugar, 'bloodSugar')}`}>
                 {pet.bloodSugar}
@@ -155,7 +157,7 @@ export default function Analysis() {
             <CardContent className="p-4">
               <div className="flex items-center gap-2 mb-2">
                 <Utensils className="w-4 h-4 text-orange-400" />
-                <span className="text-xs text-gray-400">Hunger</span>
+                <span className="text-xs text-gray-400">{t.analysis.hunger}</span>
               </div>
               <div className={`text-2xl font-bold ${getStatusColor(pet.hunger, 'stat')}`}>
                 {pet.hunger}%
@@ -167,7 +169,7 @@ export default function Analysis() {
             <CardContent className="p-4">
               <div className="flex items-center gap-2 mb-2">
                 <Zap className="w-4 h-4 text-yellow-400" />
-                <span className="text-xs text-gray-400">Energy</span>
+                <span className="text-xs text-gray-400">{t.analysis.energy}</span>
               </div>
               <div className={`text-2xl font-bold ${getStatusColor(pet.energy, 'stat')}`}>
                 {pet.energy}%
@@ -185,7 +187,7 @@ export default function Analysis() {
             <CardHeader className="pb-2">
               <CardTitle className="text-lg flex items-center gap-2 text-gray-100">
                 <Activity className="w-5 h-5 text-red-400" />
-                Blood Sugar History (24h)
+                {t.analysis.bloodSugarHistory}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -223,11 +225,11 @@ export default function Analysis() {
               <div className="flex justify-center gap-6 mt-2 text-xs">
                 <div className="flex items-center gap-1">
                   <div className="w-3 h-3 bg-green-600 rounded" />
-                  <span className="text-gray-400">Normal (70-180)</span>
+                  <span className="text-gray-400">{t.analysis.normal}</span>
                 </div>
                 <div className="flex items-center gap-1">
                   <div className="w-3 h-3 bg-red-600 rounded" />
-                  <span className="text-gray-400">High (&gt;180)</span>
+                  <span className="text-gray-400">{t.analysis.high}</span>
                 </div>
               </div>
             </CardContent>
@@ -243,7 +245,7 @@ export default function Analysis() {
             <CardHeader className="pb-2">
               <CardTitle className="text-lg flex items-center gap-2 text-gray-100">
                 <Heart className="w-5 h-5 text-pink-400" />
-                Vitals Overview (24h)
+                {t.analysis.vitalsOverview}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -283,7 +285,7 @@ export default function Analysis() {
               <div className="flex items-center justify-between gap-2">
                 <CardTitle className="text-lg flex items-center gap-2 text-gray-100">
                   <Brain className="w-5 h-5 text-purple-400" />
-                  AI Recommendations
+                  {t.analysis.aiRecommendations}
                 </CardTitle>
                 <Button 
                   variant="ghost" 
@@ -302,17 +304,17 @@ export default function Analysis() {
                 <div className="text-center py-6">
                   <Brain className="w-12 h-12 mx-auto text-purple-500/50 mb-3" />
                   <p className="text-sm text-gray-400 mb-4">
-                    Get personalized recommendations based on your pet's health patterns
+                    {t.analysis.getPersonalized}
                   </p>
                   <Button onClick={fetchRecommendations} className="bg-purple-600 hover:bg-purple-700" data-testid="button-analyze">
-                    <Brain className="w-4 h-4 mr-2" />
-                    Analyze Patterns
+                    <Brain className={`w-4 h-4 ${isRTL ? 'ml-2' : 'mr-2'}`} />
+                    {t.analysis.analyzePatterns}
                   </Button>
                 </div>
               ) : isLoadingRecs ? (
                 <div className="text-center py-6">
                   <RefreshCw className="w-8 h-8 mx-auto text-purple-400 animate-spin mb-3" />
-                  <p className="text-sm text-gray-400">Analyzing health patterns...</p>
+                  <p className="text-sm text-gray-400">{t.analysis.analyzingPatterns}</p>
                 </div>
               ) : (
                 <div className="space-y-3">
@@ -343,24 +345,24 @@ export default function Analysis() {
         >
           <Card className="bg-gray-800/80 border-gray-700">
             <CardHeader className="pb-2">
-              <CardTitle className="text-lg text-gray-100">Quick Stats</CardTitle>
+              <CardTitle className="text-lg text-gray-100">{t.analysis.quickStats}</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-2 gap-4 text-sm">
                 <div>
-                  <p className="text-gray-400">Level</p>
+                  <p className="text-gray-400">{t.analysis.level}</p>
                   <p className="font-bold text-lg text-gray-100">{pet.level}</p>
                 </div>
                 <div>
-                  <p className="text-gray-400">Experience</p>
+                  <p className="text-gray-400">{t.analysis.experience}</p>
                   <p className="font-bold text-lg text-gray-100">{pet.experience}/100 XP</p>
                 </div>
                 <div>
-                  <p className="text-gray-400">Coins</p>
+                  <p className="text-gray-400">{t.analysis.coins}</p>
                   <p className="font-bold text-lg text-yellow-400">{pet.coins}</p>
                 </div>
                 <div>
-                  <p className="text-gray-400">Mood</p>
+                  <p className="text-gray-400">{t.analysis.mood}</p>
                   <p className="font-bold text-lg text-gray-100 capitalize">{pet.mood}</p>
                 </div>
               </div>

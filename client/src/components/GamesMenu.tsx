@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { X, Brain, Puzzle, Target, Clock, Lock, Heart, Trophy, Star, Sparkles, CheckCircle, XCircle } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface GamesMenuProps {
   isOpen: boolean;
@@ -10,100 +11,104 @@ interface GamesMenuProps {
   petId: number;
 }
 
-const scenarios = [
-  {
-    id: 1,
-    question: "Your blood sugar is 250 mg/dL. What should you do?",
-    options: [
-      { text: "Take insulin", correct: true },
-      { text: "Eat candy", correct: false }
-    ],
-    explanation: "High blood sugar needs insulin to bring it down!"
-  },
-  {
-    id: 2,
-    question: "Your blood sugar is 55 mg/dL. What should you do?",
-    options: [
-      { text: "Take more insulin", correct: false },
-      { text: "Eat a snack", correct: true }
-    ],
-    explanation: "Low blood sugar needs food to bring it up quickly!"
-  },
-  {
-    id: 3,
-    question: "You're about to exercise. What should you check first?",
-    options: [
-      { text: "Blood sugar levels", correct: true },
-      { text: "The weather", correct: false }
-    ],
-    explanation: "Always check blood sugar before exercise!"
-  },
-  {
-    id: 4,
-    question: "You feel dizzy and shaky. This might mean your blood sugar is...",
-    options: [
-      { text: "Too high", correct: false },
-      { text: "Too low", correct: true }
-    ],
-    explanation: "Shakiness and dizziness are signs of low blood sugar!"
-  },
-  {
-    id: 5,
-    question: "What's a healthy blood sugar range?",
-    options: [
-      { text: "70-180 mg/dL", correct: true },
-      { text: "200-300 mg/dL", correct: false }
-    ],
-    explanation: "70-180 mg/dL is the target range for most people!"
-  },
-  {
-    id: 6,
-    question: "You're very thirsty and need to pee a lot. This could mean...",
-    options: [
-      { text: "Blood sugar is too high", correct: true },
-      { text: "Blood sugar is too low", correct: false }
-    ],
-    explanation: "Extreme thirst and frequent urination are signs of high blood sugar!"
-  },
-  {
-    id: 7,
-    question: "Which food will raise blood sugar the fastest?",
-    options: [
-      { text: "Juice or candy", correct: true },
-      { text: "Cheese and nuts", correct: false }
-    ],
-    explanation: "Simple sugars like juice and candy work fastest for low blood sugar!"
-  },
-  {
-    id: 8,
-    question: "How often should you check your blood sugar?",
-    options: [
-      { text: "Only when you feel sick", correct: false },
-      { text: "Regularly throughout the day", correct: true }
-    ],
-    explanation: "Regular monitoring helps you stay in control!"
-  },
-  {
-    id: 9,
-    question: "Your friend offers you a sugary soda. What's the best choice?",
-    options: [
-      { text: "Drink it all quickly", correct: false },
-      { text: "Choose water or check blood sugar first", correct: true }
-    ],
-    explanation: "It's smart to check your levels and make informed choices!"
-  },
-  {
-    id: 10,
-    question: "What should you always carry with you?",
-    options: [
-      { text: "Fast-acting sugar snacks", correct: true },
-      { text: "Just your phone", correct: false }
-    ],
-    explanation: "Always carry glucose tablets or snacks for emergencies!"
-  }
-];
+function getScenarios(t: ReturnType<typeof useLanguage>['t']) {
+  return [
+    {
+      id: 1,
+      question: t.games.scenario1Q,
+      options: [
+        { text: t.games.scenario1A1, correct: true },
+        { text: t.games.scenario1A2, correct: false }
+      ],
+      explanation: t.games.scenario1Exp
+    },
+    {
+      id: 2,
+      question: t.games.scenario2Q,
+      options: [
+        { text: t.games.scenario2A1, correct: false },
+        { text: t.games.scenario2A2, correct: true }
+      ],
+      explanation: t.games.scenario2Exp
+    },
+    {
+      id: 3,
+      question: t.games.scenario3Q,
+      options: [
+        { text: t.games.scenario3A1, correct: true },
+        { text: t.games.scenario3A2, correct: false }
+      ],
+      explanation: t.games.scenario3Exp
+    },
+    {
+      id: 4,
+      question: t.games.scenario4Q,
+      options: [
+        { text: t.games.scenario4A1, correct: false },
+        { text: t.games.scenario4A2, correct: true }
+      ],
+      explanation: t.games.scenario4Exp
+    },
+    {
+      id: 5,
+      question: t.games.scenario5Q,
+      options: [
+        { text: t.games.scenario5A1, correct: true },
+        { text: t.games.scenario5A2, correct: false }
+      ],
+      explanation: t.games.scenario5Exp
+    },
+    {
+      id: 6,
+      question: t.games.scenario6Q,
+      options: [
+        { text: t.games.scenario6A1, correct: true },
+        { text: t.games.scenario6A2, correct: false }
+      ],
+      explanation: t.games.scenario6Exp
+    },
+    {
+      id: 7,
+      question: t.games.scenario7Q,
+      options: [
+        { text: t.games.scenario7A1, correct: true },
+        { text: t.games.scenario7A2, correct: false }
+      ],
+      explanation: t.games.scenario7Exp
+    },
+    {
+      id: 8,
+      question: t.games.scenario8Q,
+      options: [
+        { text: t.games.scenario8A1, correct: false },
+        { text: t.games.scenario8A2, correct: true }
+      ],
+      explanation: t.games.scenario8Exp
+    },
+    {
+      id: 9,
+      question: t.games.scenario9Q,
+      options: [
+        { text: t.games.scenario9A1, correct: false },
+        { text: t.games.scenario9A2, correct: true }
+      ],
+      explanation: t.games.scenario9Exp
+    },
+    {
+      id: 10,
+      question: t.games.scenario10Q,
+      options: [
+        { text: t.games.scenario10A1, correct: true },
+        { text: t.games.scenario10A2, correct: false }
+      ],
+      explanation: t.games.scenario10Exp
+    }
+  ];
+}
 
 function ScenarioGame({ onBack }: { onBack: () => void }) {
+  const { t, isRTL } = useLanguage();
+  const scenarios = getScenarios(t);
   const [hearts, setHearts] = useState(5);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [score, setScore] = useState(0);
@@ -149,6 +154,7 @@ function ScenarioGame({ onBack }: { onBack: () => void }) {
         initial={{ opacity: 0, scale: 0.8 }}
         animate={{ opacity: 1, scale: 1 }}
         className="flex flex-col items-center justify-center h-full text-center p-6"
+        dir={isRTL ? 'rtl' : 'ltr'}
       >
         <motion.div
           animate={{ rotate: [0, -10, 10, -10, 0] }}
@@ -156,16 +162,16 @@ function ScenarioGame({ onBack }: { onBack: () => void }) {
         >
           <XCircle className="w-24 h-24 text-red-500 mb-4" />
         </motion.div>
-        <h2 className="text-3xl font-bold text-red-500 mb-2">Game Over!</h2>
-        <p className="text-muted-foreground mb-2">You ran out of hearts!</p>
-        <p className="text-lg font-semibold mb-6">Score: {score}/{shuffledScenarios.length}</p>
+        <h2 className="text-3xl font-bold text-red-500 mb-2">{t.games.gameOver}</h2>
+        <p className="text-muted-foreground mb-2">{t.games.ranOutHearts}</p>
+        <p className="text-lg font-semibold mb-6">{t.games.score}: {score}/{shuffledScenarios.length}</p>
         <div className="flex gap-3">
           <Button onClick={resetGame} className="rounded-xl">
-            <Star className="w-5 h-5 mr-2" />
-            Try Again
+            <Star className={`w-5 h-5 ${isRTL ? 'ml-2' : 'mr-2'}`} />
+            {t.games.tryAgain}
           </Button>
           <Button variant="outline" onClick={onBack} className="rounded-xl">
-            Back to Games
+            {t.games.backToGames}
           </Button>
         </div>
       </motion.div>
@@ -178,6 +184,7 @@ function ScenarioGame({ onBack }: { onBack: () => void }) {
         initial={{ opacity: 0, scale: 0.8 }}
         animate={{ opacity: 1, scale: 1 }}
         className="flex flex-col items-center justify-center h-full text-center p-6"
+        dir={isRTL ? 'rtl' : 'ltr'}
       >
         <motion.div
           animate={{ scale: [1, 1.2, 1], rotate: [0, 360] }}
@@ -185,9 +192,9 @@ function ScenarioGame({ onBack }: { onBack: () => void }) {
         >
           <Trophy className="w-24 h-24 text-yellow-500 mb-4" />
         </motion.div>
-        <h2 className="text-3xl font-bold text-yellow-500 mb-2">You Win!</h2>
-        <p className="text-muted-foreground mb-2">Amazing job!</p>
-        <p className="text-lg font-semibold mb-2">Score: {score}/{shuffledScenarios.length}</p>
+        <h2 className="text-3xl font-bold text-yellow-500 mb-2">{t.games.youWin}</h2>
+        <p className="text-muted-foreground mb-2">{t.games.amazingJob}</p>
+        <p className="text-lg font-semibold mb-2">{t.games.score}: {score}/{shuffledScenarios.length}</p>
         <div className="flex items-center gap-1 mb-6">
           {Array.from({ length: hearts }).map((_, i) => (
             <Heart key={i} className="w-6 h-6 text-red-500 fill-red-500" />
@@ -195,11 +202,11 @@ function ScenarioGame({ onBack }: { onBack: () => void }) {
         </div>
         <div className="flex gap-3">
           <Button onClick={resetGame} className="rounded-xl">
-            <Star className="w-5 h-5 mr-2" />
-            Play Again
+            <Star className={`w-5 h-5 ${isRTL ? 'ml-2' : 'mr-2'}`} />
+            {t.games.playAgain}
           </Button>
           <Button variant="outline" onClick={onBack} className="rounded-xl">
-            Back to Games
+            {t.games.backToGames}
           </Button>
         </div>
       </motion.div>
@@ -207,7 +214,7 @@ function ScenarioGame({ onBack }: { onBack: () => void }) {
   }
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full" dir={isRTL ? 'rtl' : 'ltr'}>
       <div className="flex items-center justify-between p-4 border-b border-white/10">
         <Button variant="ghost" size="icon" onClick={onBack}>
           <X className="w-6 h-6" />
@@ -233,7 +240,7 @@ function ScenarioGame({ onBack }: { onBack: () => void }) {
 
       <div className="flex-1 flex flex-col items-center justify-center p-6">
         <div className="text-xs text-muted-foreground mb-4">
-          Question {currentIndex + 1} of {shuffledScenarios.length}
+          {t.games.question} {currentIndex + 1} {t.games.of} {shuffledScenarios.length}
         </div>
 
         <AnimatePresence mode="wait">
@@ -245,7 +252,7 @@ function ScenarioGame({ onBack }: { onBack: () => void }) {
               className="absolute inset-0 flex flex-col items-center justify-center bg-green-500/20 backdrop-blur-sm z-10"
             >
               <CheckCircle className="w-20 h-20 text-green-500 mb-4" />
-              <p className="text-xl font-bold text-green-600">Correct!</p>
+              <p className="text-xl font-bold text-green-600">{t.games.correct}</p>
               <p className="text-sm text-muted-foreground mt-2 px-6 text-center max-w-xs">
                 {currentScenario.explanation}
               </p>
@@ -259,7 +266,7 @@ function ScenarioGame({ onBack }: { onBack: () => void }) {
               className="absolute inset-0 flex flex-col items-center justify-center bg-red-500/20 backdrop-blur-sm z-10"
             >
               <XCircle className="w-20 h-20 text-red-500 mb-4" />
-              <p className="text-xl font-bold text-red-600">Oops!</p>
+              <p className="text-xl font-bold text-red-600">{t.games.oops}</p>
               <p className="text-sm text-muted-foreground mt-2 px-6 text-center max-w-xs">
                 {currentScenario.explanation}
               </p>
@@ -311,6 +318,7 @@ function ScenarioGame({ onBack }: { onBack: () => void }) {
 }
 
 export function GamesMenu({ isOpen, onClose }: GamesMenuProps) {
+  const { t, isRTL } = useLanguage();
   const [activeGame, setActiveGame] = useState<'menu' | 'scenarios'>('menu');
 
   const handleClose = () => {
@@ -327,13 +335,14 @@ export function GamesMenu({ isOpen, onClose }: GamesMenuProps) {
       exit={{ y: "100%" }}
       transition={{ type: "spring", damping: 25, stiffness: 300 }}
       className="absolute inset-0 z-50 bg-card flex flex-col"
+      dir={isRTL ? 'rtl' : 'ltr'}
     >
       {activeGame === 'menu' ? (
         <>
           <div className="pt-12 px-6 pb-4 flex items-center justify-between border-b border-white/10">
             <h1 className="text-2xl font-display font-bold flex items-center gap-2">
               <Sparkles className="w-6 h-6 text-yellow-500" />
-              Games
+              {t.games.title}
             </h1>
             <Button variant="ghost" size="icon" onClick={handleClose}>
               <X className="w-6 h-6" />
@@ -355,8 +364,8 @@ export function GamesMenu({ isOpen, onClose }: GamesMenuProps) {
                     <Brain className="w-7 h-7 text-white" />
                   </div>
                   <div className="flex-1">
-                    <h3 className="font-bold text-lg">Solve Scenarios</h3>
-                    <p className="text-sm text-muted-foreground">Test your diabetes knowledge!</p>
+                    <h3 className="font-bold text-lg">{t.games.solveScenarios}</h3>
+                    <p className="text-sm text-muted-foreground">{t.games.testKnowledge}</p>
                   </div>
                   <div className="flex items-center gap-1">
                     <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
@@ -378,12 +387,12 @@ export function GamesMenu({ isOpen, onClose }: GamesMenuProps) {
                     <Puzzle className="w-7 h-7 text-white" />
                   </div>
                   <div className="flex-1">
-                    <h3 className="font-bold text-lg">Sugar Match</h3>
-                    <p className="text-sm text-muted-foreground">Match foods to sugar levels!</p>
+                    <h3 className="font-bold text-lg">{t.games.sugarMatch}</h3>
+                    <p className="text-sm text-muted-foreground">{t.games.matchFoods}</p>
                   </div>
                   <div className="flex items-center gap-1 bg-orange-500/20 px-2 py-1 rounded-full">
                     <Lock className="w-3 h-3 text-orange-500" />
-                    <span className="text-xs font-medium text-orange-500">Soon</span>
+                    <span className="text-xs font-medium text-orange-500">{t.games.soon}</span>
                   </div>
                 </div>
               </Card>
@@ -400,12 +409,12 @@ export function GamesMenu({ isOpen, onClose }: GamesMenuProps) {
                     <Target className="w-7 h-7 text-white" />
                   </div>
                   <div className="flex-1">
-                    <h3 className="font-bold text-lg">Insulin Challenge</h3>
-                    <p className="text-sm text-muted-foreground">Calculate the right dose!</p>
+                    <h3 className="font-bold text-lg">{t.games.insulinChallenge}</h3>
+                    <p className="text-sm text-muted-foreground">{t.games.calculateDose}</p>
                   </div>
                   <div className="flex items-center gap-1 bg-orange-500/20 px-2 py-1 rounded-full">
                     <Lock className="w-3 h-3 text-orange-500" />
-                    <span className="text-xs font-medium text-orange-500">Soon</span>
+                    <span className="text-xs font-medium text-orange-500">{t.games.soon}</span>
                   </div>
                 </div>
               </Card>
@@ -422,12 +431,12 @@ export function GamesMenu({ isOpen, onClose }: GamesMenuProps) {
                     <Clock className="w-7 h-7 text-white" />
                   </div>
                   <div className="flex-1">
-                    <h3 className="font-bold text-lg">Speed Check</h3>
-                    <p className="text-sm text-muted-foreground">Quick decisions under pressure!</p>
+                    <h3 className="font-bold text-lg">{t.games.speedCheck}</h3>
+                    <p className="text-sm text-muted-foreground">{t.games.quickDecisions}</p>
                   </div>
                   <div className="flex items-center gap-1 bg-orange-500/20 px-2 py-1 rounded-full">
                     <Lock className="w-3 h-3 text-orange-500" />
-                    <span className="text-xs font-medium text-orange-500">Soon</span>
+                    <span className="text-xs font-medium text-orange-500">{t.games.soon}</span>
                   </div>
                 </div>
               </Card>
