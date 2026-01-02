@@ -634,7 +634,7 @@ export function PetDashboard({ pet }: PetDashboardProps) {
                <div className="h-full bg-primary" style={{ width: `${experiencePercent}%` }} />
             </div>
           </div>
-          <Button variant="ghost" size="icon" className="w-12 h-12 text-muted-foreground hover:text-primary hover-elevate" onClick={() => window.location.href = "/"} data-testid="button-analysis">
+          <Button variant="ghost" size="icon" className="w-12 h-12 text-muted-foreground hover:text-primary hover-elevate" onClick={() => window.location.href = "/analysis"} data-testid="button-analysis">
              <BarChart3 className="w-6 h-6" />
           </Button>
           <Button variant="ghost" size="icon" className="w-12 h-12 text-muted-foreground hover:text-primary hover-elevate" onClick={() => window.location.href = "/settings"} data-testid="button-settings">

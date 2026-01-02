@@ -422,5 +422,94 @@ export async function registerRoutes(
     }
   });
 
+  // AI Recommendations endpoint
+  app.post("/api/pets/:id/recommendations", async (req, res) => {
+    const petId = Number(req.params.id);
+    const pet = await storage.getPet(petId);
+    
+    if (!pet) {
+      res.status(404).json({ message: "Pet not found" });
+      return;
+    }
+
+    try {
+      const { OpenAI } = await import("openai");
+      const openai = new OpenAI();
+
+      const prompt = `
+        You are an AI health advisor for a virtual pet diabetes management game for children.
+        
+        Analyze this pet's current health data and provide 3-4 simple, actionable recommendations:
+        - Blood Sugar: ${pet.bloodSugar} mg/dL (normal range: 70-180)
+        - Health: ${pet.health}/100
+        - Hunger: ${pet.hunger}/100
+        - Energy: ${pet.energy}/100
+        - Current Mood: ${pet.mood}
+        - Is Sleeping: ${pet.isAsleep}
+        - Level: ${pet.level}
+        
+        Based on patterns:
+        ${pet.bloodSugar > 180 ? "- Blood sugar is HIGH" : ""}
+        ${pet.bloodSugar < 70 ? "- Blood sugar is LOW" : ""}
+        ${pet.hunger < 40 ? "- Pet is HUNGRY" : ""}
+        ${pet.energy < 30 ? "- Pet is TIRED" : ""}
+        ${pet.health < 50 ? "- Health is LOW" : ""}
+        
+        Provide recommendations in simple language a child can understand.
+        Format: Return ONLY a JSON array of 3-4 recommendation strings. No explanation.
+        Example: ["Recommendation 1", "Recommendation 2", "Recommendation 3"]
+      `;
+
+      const completion = await openai.chat.completions.create({
+        messages: [{ role: "user", content: prompt }],
+        model: "gpt-4o-mini",
+        response_format: { type: "json_object" },
+      });
+
+      const content = completion.choices[0].message.content || '{"recommendations": []}';
+      let recommendations: string[] = [];
+      
+      try {
+        const parsed = JSON.parse(content);
+        recommendations = Array.isArray(parsed) ? parsed : (parsed.recommendations || []);
+      } catch {
+        recommendations = ["Keep checking your pet's blood sugar regularly!", "Feed your pet healthy foods to keep them strong!", "Make sure your pet gets enough rest!"];
+      }
+
+      res.json({ recommendations });
+
+    } catch (error) {
+      console.error("Recommendations Error:", error);
+      // Fallback recommendations
+      const fallbackRecs = [];
+      
+      if (pet.bloodSugar > 180) {
+        fallbackRecs.push("Your pet's blood sugar is high! Consider giving some insulin to bring it down.");
+      } else if (pet.bloodSugar < 70) {
+        fallbackRecs.push("Your pet's blood sugar is low! Give them some food with carbs to raise it.");
+      } else {
+        fallbackRecs.push("Great job! Your pet's blood sugar is in a healthy range.");
+      }
+      
+      if (pet.hunger < 40) {
+        fallbackRecs.push("Your pet is getting hungry. Time for a healthy snack!");
+      }
+      
+      if (pet.energy < 30) {
+        fallbackRecs.push("Your pet is tired. Let them take a nap to restore energy.");
+      }
+      
+      if (pet.health < 50) {
+        fallbackRecs.push("Your pet's health is low. Keep their stats balanced to help them recover.");
+      }
+      
+      if (fallbackRecs.length === 0) {
+        fallbackRecs.push("Your pet is doing great! Keep up the good care.");
+      }
+
+      res.json({ recommendations: fallbackRecs });
+    }
+  });
+
   return httpServer;
 }
