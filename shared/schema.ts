@@ -39,6 +39,22 @@ export const foods = pgTable("foods", {
   image: text("image"), // Icon name or url
 });
 
+export const shopItems = pgTable("shop_items", {
+  id: serial("id").primaryKey(),
+  itemId: text("item_id").notNull().unique(), // e.g., "bowtie", "crown"
+  category: text("category").notNull(), // "clothes", "accessories", "toys"
+  price: integer("price").notNull(),
+  icon: text("icon").notNull(), // Icon name from lucide-react
+});
+
+export const ownedItems = pgTable("owned_items", {
+  id: serial("id").primaryKey(),
+  petId: integer("pet_id").notNull().references(() => pets.id),
+  itemId: text("item_id").notNull(),
+  equipped: boolean("equipped").notNull().default(false),
+  purchasedAt: timestamp("purchased_at").defaultNow(),
+});
+
 export const insertPetSchema = createInsertSchema(pets).omit({ 
   id: true, 
   userId: true,
@@ -54,11 +70,17 @@ export const insertPetSchema = createInsertSchema(pets).omit({
   createdAt: true 
 });
 export const insertFoodSchema = createInsertSchema(foods).omit({ id: true });
+export const insertShopItemSchema = createInsertSchema(shopItems).omit({ id: true });
+export const insertOwnedItemSchema = createInsertSchema(ownedItems).omit({ id: true, purchasedAt: true });
 
 export type Pet = typeof pets.$inferSelect;
 export type InsertPet = z.infer<typeof insertPetSchema>;
 export type Food = typeof foods.$inferSelect;
 export type InsertFood = z.infer<typeof insertFoodSchema>;
+export type ShopItem = typeof shopItems.$inferSelect;
+export type InsertShopItem = z.infer<typeof insertShopItemSchema>;
+export type OwnedItem = typeof ownedItems.$inferSelect;
+export type InsertOwnedItem = z.infer<typeof insertOwnedItemSchema>;
 
 export type ChatRequest = {
   message: string;

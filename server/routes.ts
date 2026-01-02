@@ -511,5 +511,98 @@ export async function registerRoutes(
     }
   });
 
+  // Shop Routes
+  app.get("/api/shop/items", async (req, res) => {
+    try {
+      const items = await storage.getShopItems();
+      res.json(items);
+    } catch (error) {
+      console.error("Error fetching shop items:", error);
+      res.status(500).json({ message: "Failed to fetch shop items" });
+    }
+  });
+
+  app.get("/api/pets/:id/owned-items", async (req, res) => {
+    try {
+      const petId = Number(req.params.id);
+      const items = await storage.getOwnedItemsByPetId(petId);
+      res.json(items);
+    } catch (error) {
+      console.error("Error fetching owned items:", error);
+      res.status(500).json({ message: "Failed to fetch owned items" });
+    }
+  });
+
+  app.get("/api/pets/:id/equipped-items", async (req, res) => {
+    try {
+      const petId = Number(req.params.id);
+      const items = await storage.getEquippedItems(petId);
+      res.json(items);
+    } catch (error) {
+      console.error("Error fetching equipped items:", error);
+      res.status(500).json({ message: "Failed to fetch equipped items" });
+    }
+  });
+
+  app.post("/api/pets/:id/purchase", async (req, res) => {
+    try {
+      const petId = Number(req.params.id);
+      const { itemId, price } = req.body;
+
+      const pet = await storage.getPet(petId);
+      if (!pet) {
+        res.status(404).json({ message: "Pet not found" });
+        return;
+      }
+
+      if (pet.coins < price) {
+        res.status(400).json({ message: "Not enough coins" });
+        return;
+      }
+
+      // Check if already owned
+      const ownedItems = await storage.getOwnedItemsByPetId(petId);
+      if (ownedItems.some(item => item.itemId === itemId)) {
+        res.status(400).json({ message: "Item already owned" });
+        return;
+      }
+
+      // Deduct coins and add item
+      await storage.updatePet(petId, { coins: pet.coins - price });
+      const ownedItem = await storage.purchaseItem(petId, itemId);
+
+      res.json({ success: true, ownedItem, newCoins: pet.coins - price });
+    } catch (error) {
+      console.error("Error purchasing item:", error);
+      res.status(500).json({ message: "Failed to purchase item" });
+    }
+  });
+
+  app.post("/api/pets/:id/equip", async (req, res) => {
+    try {
+      const petId = Number(req.params.id);
+      const { itemId } = req.body;
+
+      const ownedItem = await storage.equipItem(petId, itemId);
+      res.json({ success: true, ownedItem });
+    } catch (error) {
+      console.error("Error equipping item:", error);
+      res.status(500).json({ message: "Failed to equip item" });
+    }
+  });
+
+  app.post("/api/pets/:id/unequip", async (req, res) => {
+    try {
+      const petId = Number(req.params.id);
+      const { itemId } = req.body;
+
+      const ownedItem = await storage.unequipItem(petId, itemId);
+      res.json({ success: true, ownedItem });
+    } catch (error) {
+      console.error("Error unequipping item:", error);
+      res.status(500).json({ message: "Failed to unequip item" });
+    }
+  });
+
   return httpServer;
 }

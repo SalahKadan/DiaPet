@@ -1,6 +1,6 @@
 import { db } from "./db";
-import { pets, foods, users, type Pet, type InsertPet, type Food, type User } from "@shared/schema";
-import { eq } from "drizzle-orm";
+import { pets, foods, users, shopItems, ownedItems, type Pet, type InsertPet, type Food, type User, type ShopItem, type OwnedItem, type InsertOwnedItem } from "@shared/schema";
+import { eq, and } from "drizzle-orm";
 
 type UpsertUser = {
   id: string;
@@ -21,6 +21,13 @@ export interface IStorage {
   
   getFoods(): Promise<Food[]>;
   createFood(food: Food): Promise<Food>;
+
+  getShopItems(): Promise<ShopItem[]>;
+  getOwnedItemsByPetId(petId: number): Promise<OwnedItem[]>;
+  purchaseItem(petId: number, itemId: string): Promise<OwnedItem>;
+  equipItem(petId: number, itemId: string): Promise<OwnedItem>;
+  unequipItem(petId: number, itemId: string): Promise<OwnedItem>;
+  getEquippedItems(petId: number): Promise<OwnedItem[]>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -66,6 +73,44 @@ export class DatabaseStorage implements IStorage {
     // @ts-ignore
     const [newFood] = await db.insert(foods).values(food).returning();
     return newFood;
+  }
+
+  async getShopItems(): Promise<ShopItem[]> {
+    return await db.select().from(shopItems);
+  }
+
+  async getOwnedItemsByPetId(petId: number): Promise<OwnedItem[]> {
+    return await db.select().from(ownedItems).where(eq(ownedItems.petId, petId));
+  }
+
+  async purchaseItem(petId: number, itemId: string): Promise<OwnedItem> {
+    const [newItem] = await db.insert(ownedItems).values({ petId, itemId, equipped: false }).returning();
+    return newItem;
+  }
+
+  async equipItem(petId: number, itemId: string): Promise<OwnedItem> {
+    const [updated] = await db
+      .update(ownedItems)
+      .set({ equipped: true })
+      .where(and(eq(ownedItems.petId, petId), eq(ownedItems.itemId, itemId)))
+      .returning();
+    return updated;
+  }
+
+  async unequipItem(petId: number, itemId: string): Promise<OwnedItem> {
+    const [updated] = await db
+      .update(ownedItems)
+      .set({ equipped: false })
+      .where(and(eq(ownedItems.petId, petId), eq(ownedItems.itemId, itemId)))
+      .returning();
+    return updated;
+  }
+
+  async getEquippedItems(petId: number): Promise<OwnedItem[]> {
+    return await db
+      .select()
+      .from(ownedItems)
+      .where(and(eq(ownedItems.petId, petId), eq(ownedItems.equipped, true)));
   }
 }
 
