@@ -59,14 +59,10 @@ export function PetDashboard({ pet }: PetDashboardProps) {
   }, [pet.lastBloodTest]);
 
   useEffect(() => {
-    if (pet.activeScenario && pet.activeScenario !== lastScenarioRef.current) {
+    if (pet.activeScenario) {
       lastScenarioRef.current = pet.activeScenario;
       setShowChallenge(true);
-      const timer = setTimeout(() => {
-        setShowChallenge(false);
-      }, 20000);
-      return () => clearTimeout(timer);
-    } else if (!pet.activeScenario) {
+    } else {
       lastScenarioRef.current = null;
       setShowChallenge(false);
     }
