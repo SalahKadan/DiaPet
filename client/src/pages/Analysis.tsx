@@ -68,7 +68,7 @@ export default function Analysis() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-950 flex items-center justify-center">
+      <div className="h-screen bg-gradient-to-b from-gray-900 to-gray-950 flex items-center justify-center">
         <div className="animate-pulse text-blue-400">Loading analysis...</div>
       </div>
     );
@@ -76,7 +76,7 @@ export default function Analysis() {
 
   if (!pet) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-950 flex items-center justify-center">
+      <div className="h-screen bg-gradient-to-b from-gray-900 to-gray-950 flex items-center justify-center">
         <p className="text-gray-400">No pet found</p>
       </div>
     );
@@ -108,7 +108,7 @@ export default function Analysis() {
   const BloodSugarTrendIcon = bloodSugarTrend.icon;
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-950 p-4 pb-24">
+    <div className="h-screen overflow-y-auto bg-gradient-to-b from-gray-900 to-gray-950 p-4 pb-24">
       <div className="max-w-lg mx-auto space-y-6">
         <div className="flex items-center gap-4">
           <Button variant="ghost" size="icon" onClick={() => window.location.href = "/pet"} className="text-gray-300 hover:text-white" data-testid="button-back">
