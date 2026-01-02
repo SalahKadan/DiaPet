@@ -684,5 +684,31 @@ export async function registerRoutes(
     }
   });
 
+  app.post("/api/pets/:id/add-coins", async (req, res) => {
+    try {
+      const petId = Number(req.params.id);
+      const { amount } = req.body;
+
+      if (typeof amount !== 'number' || amount <= 0) {
+        res.status(400).json({ message: "Invalid amount" });
+        return;
+      }
+
+      const pet = await storage.getPet(petId);
+      if (!pet) {
+        res.status(404).json({ message: "Pet not found" });
+        return;
+      }
+
+      const newCoins = (pet.coins || 0) + amount;
+      const updatedPet = await storage.updatePet(petId, { coins: newCoins });
+
+      res.json({ success: true, newCoins, pet: updatedPet });
+    } catch (error) {
+      console.error("Error adding coins:", error);
+      res.status(500).json({ message: "Failed to add coins" });
+    }
+  });
+
   return httpServer;
 }
