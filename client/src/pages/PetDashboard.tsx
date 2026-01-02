@@ -517,10 +517,10 @@ export function PetDashboard({ pet }: PetDashboardProps) {
                     animate={{ opacity: 1, y: 0, scale: 1 }}
                     exit={{ opacity: 0, y: -10, scale: 0.9 }}
                     transition={{ type: "spring", damping: 20, stiffness: 300 }}
-                    className="absolute -top-24 left-1/2 -translate-x-1/2 z-30 w-[95%] max-w-[280px]"
+                    className="absolute -top-24 left-0 z-30 w-[95%] max-w-[280px]"
                   >
                     <div className="bg-white dark:bg-white text-gray-800 rounded-[24px] p-4 shadow-lg relative border border-gray-100">
-                      <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 flex flex-col items-center">
+                      <div className="absolute -bottom-3 left-1/4 flex flex-col items-center">
                         <div className="w-4 h-4 bg-white dark:bg-white rounded-full shadow-sm border border-gray-100" />
                         <div className="w-2.5 h-2.5 bg-white dark:bg-white rounded-full shadow-sm border border-gray-100 -mt-1" />
                         <div className="w-1.5 h-1.5 bg-white dark:bg-white rounded-full shadow-sm border border-gray-100 -mt-0.5" />
