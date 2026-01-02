@@ -449,6 +449,47 @@ export async function registerRoutes(
       return;
     }
 
+    // Generate simulated 24-hour history for pattern analysis
+    const generateHistory = () => {
+      const history = [];
+      let bloodSugar = pet.bloodSugar;
+      let health = pet.health;
+      let hunger = pet.hunger;
+      let energy = pet.energy;
+      
+      for (let i = 23; i >= 0; i--) {
+        const variation = () => Math.floor(Math.random() * 25) - 12;
+        bloodSugar = Math.max(50, Math.min(300, bloodSugar + variation()));
+        health = Math.max(0, Math.min(100, health + (Math.random() * 8 - 4)));
+        hunger = Math.max(0, Math.min(100, hunger + (Math.random() * 12 - 6)));
+        energy = Math.max(0, Math.min(100, energy + (Math.random() * 10 - 5)));
+        
+        history.push({
+          hour: i,
+          bloodSugar: Math.round(bloodSugar),
+          health: Math.round(health),
+          hunger: Math.round(hunger),
+          energy: Math.round(energy),
+        });
+      }
+      return history.reverse();
+    };
+
+    const history = generateHistory();
+    
+    // Calculate historical patterns
+    const avgBloodSugar = Math.round(history.reduce((a, b) => a + b.bloodSugar, 0) / history.length);
+    const avgHealth = Math.round(history.reduce((a, b) => a + b.health, 0) / history.length);
+    const avgHunger = Math.round(history.reduce((a, b) => a + b.hunger, 0) / history.length);
+    const avgEnergy = Math.round(history.reduce((a, b) => a + b.energy, 0) / history.length);
+    
+    const highBSCount = history.filter(h => h.bloodSugar > 180).length;
+    const lowBSCount = history.filter(h => h.bloodSugar < 70).length;
+    const normalBSCount = history.filter(h => h.bloodSugar >= 70 && h.bloodSugar <= 180).length;
+    const lowHealthCount = history.filter(h => h.health < 50).length;
+    const lowHungerCount = history.filter(h => h.hunger < 40).length;
+    const lowEnergyCount = history.filter(h => h.energy < 30).length;
+
     try {
       const { OpenAI } = await import("openai");
       const openai = new OpenAI();
@@ -456,25 +497,35 @@ export async function registerRoutes(
       const prompt = `
         You are an AI health advisor for a virtual pet diabetes management game for children.
         
-        Analyze this pet's current health data and provide 3-4 simple, actionable recommendations:
-        - Blood Sugar: ${pet.bloodSugar} mg/dL (normal range: 70-180)
-        - Health: ${pet.health}/100
-        - Hunger: ${pet.hunger}/100
-        - Energy: ${pet.energy}/100
-        - Current Mood: ${pet.mood}
-        - Is Sleeping: ${pet.isAsleep}
-        - Level: ${pet.level}
+        Analyze this pet's 24-HOUR HISTORY patterns and provide 3-4 recommendations based on trends:
         
-        Based on patterns:
-        ${pet.bloodSugar > 180 ? "- Blood sugar is HIGH" : ""}
-        ${pet.bloodSugar < 70 ? "- Blood sugar is LOW" : ""}
-        ${pet.hunger < 40 ? "- Pet is HUNGRY" : ""}
-        ${pet.energy < 30 ? "- Pet is TIRED" : ""}
-        ${pet.health < 50 ? "- Health is LOW" : ""}
+        HISTORICAL AVERAGES (last 24 hours):
+        - Average Blood Sugar: ${avgBloodSugar} mg/dL (normal range: 70-180)
+        - Average Health: ${avgHealth}/100
+        - Average Hunger: ${avgHunger}/100
+        - Average Energy: ${avgEnergy}/100
+        
+        PATTERN ANALYSIS:
+        - High blood sugar episodes (>180): ${highBSCount} times out of 24 hours (${Math.round(highBSCount/24*100)}%)
+        - Low blood sugar episodes (<70): ${lowBSCount} times out of 24 hours (${Math.round(lowBSCount/24*100)}%)
+        - Normal blood sugar time: ${normalBSCount} times out of 24 hours (${Math.round(normalBSCount/24*100)}%)
+        - Low health episodes (<50): ${lowHealthCount} times
+        - Hungry episodes (<40 hunger): ${lowHungerCount} times
+        - Tired episodes (<30 energy): ${lowEnergyCount} times
+        
+        PET INFO:
+        - Pet Name: ${pet.name}
+        - Level: ${pet.level}
+        - Last fed: ${pet.lastFed ? new Date(pet.lastFed).toLocaleString() : 'Unknown'}
+        - Last insulin: ${pet.lastInsulin ? new Date(pet.lastInsulin).toLocaleString() : 'Unknown'}
+        - Last blood test: ${pet.lastBloodTest ? new Date(pet.lastBloodTest).toLocaleString() : 'Unknown'}
+        
+        Based on these HISTORICAL PATTERNS (not current state), provide recommendations to improve care.
+        Focus on trends like "You often have high blood sugar" or "Your pet tends to get hungry frequently".
         
         Provide recommendations in simple language a child can understand.
-        Format: Return ONLY a JSON array of 3-4 recommendation strings. No explanation.
-        Example: ["Recommendation 1", "Recommendation 2", "Recommendation 3"]
+        Format: Return ONLY a JSON object with "recommendations" key containing an array of 3-4 strings.
+        Example: {"recommendations": ["Recommendation 1", "Recommendation 2", "Recommendation 3"]}
       `;
 
       const completion = await openai.chat.completions.create({
@@ -497,31 +548,33 @@ export async function registerRoutes(
 
     } catch (error) {
       console.error("Recommendations Error:", error);
-      // Fallback recommendations
+      // Fallback recommendations based on historical patterns
       const fallbackRecs = [];
       
-      if (pet.bloodSugar > 180) {
-        fallbackRecs.push("Your pet's blood sugar is high! Consider giving some insulin to bring it down.");
-      } else if (pet.bloodSugar < 70) {
-        fallbackRecs.push("Your pet's blood sugar is low! Give them some food with carbs to raise it.");
-      } else {
-        fallbackRecs.push("Great job! Your pet's blood sugar is in a healthy range.");
+      if (highBSCount > 6) {
+        fallbackRecs.push("Your pet often has high blood sugar. Try checking it more regularly and giving insulin when needed!");
+      } else if (lowBSCount > 6) {
+        fallbackRecs.push("Your pet sometimes has low blood sugar. Make sure to feed them regularly with healthy snacks!");
+      } else if (normalBSCount > 18) {
+        fallbackRecs.push("Great job! Your pet's blood sugar has been in the healthy range most of the time!");
       }
       
-      if (pet.hunger < 40) {
-        fallbackRecs.push("Your pet is getting hungry. Time for a healthy snack!");
+      if (lowHungerCount > 8) {
+        fallbackRecs.push("Your pet gets hungry often. Try feeding them more frequently with healthy foods!");
       }
       
-      if (pet.energy < 30) {
-        fallbackRecs.push("Your pet is tired. Let them take a nap to restore energy.");
+      if (lowEnergyCount > 8) {
+        fallbackRecs.push("Your pet tends to get tired a lot. Let them sleep to restore their energy!");
       }
       
-      if (pet.health < 50) {
-        fallbackRecs.push("Your pet's health is low. Keep their stats balanced to help them recover.");
+      if (lowHealthCount > 6) {
+        fallbackRecs.push("Your pet's health has been low sometimes. Keep their blood sugar balanced to help them stay healthy!");
       }
       
       if (fallbackRecs.length === 0) {
-        fallbackRecs.push("Your pet is doing great! Keep up the good care.");
+        fallbackRecs.push("Keep checking your pet's blood sugar regularly!");
+        fallbackRecs.push("Feed your pet healthy foods to keep them strong!");
+        fallbackRecs.push("Make sure your pet gets enough rest!");
       }
 
       res.json({ recommendations: fallbackRecs });
