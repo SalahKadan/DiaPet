@@ -8,7 +8,7 @@ import { GamesMenu } from "@/components/GamesMenu";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { Heart, Zap, Utensils, Moon, Sun, MessageCircle, Activity, BarChart3, Gamepad2, Syringe, Coins, Clock, Settings } from "lucide-react";
+import { Heart, Zap, Utensils, Moon, Sun, MessageCircle, Activity, BarChart3, Gamepad2, Syringe, Coins, Clock, Settings, ShoppingCart } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useMutation } from "@tanstack/react-query";
@@ -477,31 +477,41 @@ export function PetDashboard({ pet }: PetDashboardProps) {
             <StatusIndicator label="FOOD" value={pet.hunger} icon={<Utensils className="w-3 h-3 text-orange-500" />} colorClass="bg-orange-500" className="h-8" />
             <StatusIndicator label="NRG" value={pet.energy} icon={<Zap className="w-3 h-3 text-yellow-500" />} colorClass="bg-yellow-500" className="h-8" />
           </div>
-          <div className="flex items-center gap-2 mt-1">
-            <div className="flex items-center gap-2 bg-yellow-100 dark:bg-yellow-900/50 px-3 py-1.5 rounded-full shadow-md">
-              <Coins className="w-4 h-4 text-yellow-600" />
-              <span className="text-sm font-bold text-yellow-700 dark:text-yellow-300" data-testid="text-coins">{pet.coins || 0}</span>
-              <AnimatePresence>
-                {earnedCoin !== null && (
-                  <motion.span
-                    initial={{ opacity: 0, y: 10, scale: 0.5 }}
-                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                    exit={{ opacity: 0, y: -10 }}
-                    className={`text-xs font-bold ${earnedCoin > 0 ? 'text-green-600' : 'text-red-600'}`}
-                  >
-                    {earnedCoin > 0 ? '+1' : '-1'}
-                  </motion.span>
-                )}
-              </AnimatePresence>
-            </div>
-            {cooldownRemaining > 0 && (
-              <div className="flex items-center gap-2 bg-gray-100 dark:bg-gray-800 px-3 py-1 rounded-full shadow-md">
-                <Clock className="w-3 h-3 text-gray-500" />
-                <span className="text-xs font-medium text-gray-600 dark:text-gray-400" data-testid="text-cooldown">
-                  {cooldownRemaining}s
-                </span>
+          <div className="flex items-center justify-between mt-1">
+            <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 bg-yellow-100 dark:bg-yellow-900/50 px-3 py-1.5 rounded-full shadow-md">
+                <Coins className="w-4 h-4 text-yellow-600" />
+                <span className="text-sm font-bold text-yellow-700 dark:text-yellow-300" data-testid="text-coins">{pet.coins || 0}</span>
+                <AnimatePresence>
+                  {earnedCoin !== null && (
+                    <motion.span
+                      initial={{ opacity: 0, y: 10, scale: 0.5 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: -10 }}
+                      className={`text-xs font-bold ${earnedCoin > 0 ? 'text-green-600' : 'text-red-600'}`}
+                    >
+                      {earnedCoin > 0 ? '+1' : '-1'}
+                    </motion.span>
+                  )}
+                </AnimatePresence>
               </div>
-            )}
+              {cooldownRemaining > 0 && (
+                <div className="flex items-center gap-2 bg-gray-100 dark:bg-gray-800 px-3 py-1 rounded-full shadow-md">
+                  <Clock className="w-3 h-3 text-gray-500" />
+                  <span className="text-xs font-medium text-gray-600 dark:text-gray-400" data-testid="text-cooldown">
+                    {cooldownRemaining}s
+                  </span>
+                </div>
+              )}
+            </div>
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              className="w-10 h-10 text-muted-foreground"
+              data-testid="button-cart"
+            >
+              <ShoppingCart className="w-5 h-5" />
+            </Button>
           </div>
         </div>
 
