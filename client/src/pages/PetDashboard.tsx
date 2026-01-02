@@ -7,7 +7,7 @@ import { InsulinControl } from "@/components/InsulinControl";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { Heart, Zap, Utensils, Moon, Sun, MessageCircle, Activity, Stethoscope, Gamepad2, Syringe, Coins, Clock } from "lucide-react";
+import { Heart, Zap, Utensils, Moon, Sun, MessageCircle, Activity, Stethoscope, Gamepad2, Syringe, Coins, Clock, Settings } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useMutation } from "@tanstack/react-query";
@@ -639,8 +639,8 @@ export function PetDashboard({ pet }: PetDashboardProps) {
           <Button variant="ghost" size="icon" className="w-12 h-12 text-muted-foreground hover:text-primary hover-elevate" onClick={() => window.location.href = "/"}>
              <Stethoscope className="w-6 h-6" />
           </Button>
-          <Button variant="ghost" size="icon" className="w-12 h-12 text-muted-foreground hover:text-primary hover-elevate" onClick={() => window.location.href = "/"}>
-             <Zap className="w-6 h-6" />
+          <Button variant="ghost" size="icon" className="w-12 h-12 text-muted-foreground hover:text-primary hover-elevate" onClick={() => window.location.href = "/settings"} data-testid="button-settings">
+             <Settings className="w-6 h-6" />
           </Button>
         </div>
 
