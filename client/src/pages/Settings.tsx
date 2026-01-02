@@ -11,9 +11,12 @@ import { motion } from "framer-motion";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { Pet } from "@shared/schema";
 import { Switch } from "@/components/ui/switch";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { Language } from "@/lib/translations";
 
 export default function Settings() {
   const [, setLocation] = useLocation();
+  const { language, setLanguage, t, isRTL } = useLanguage();
   
   const { data: pets } = useQuery<Pet[]>({
     queryKey: ["/api/pets"],
@@ -22,7 +25,6 @@ export default function Settings() {
   const pet = pets?.[0];
   
   const [petName, setPetName] = useState("");
-  const [language, setLanguage] = useState("en");
   const [soundEnabled, setSoundEnabled] = useState(true);
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
 
@@ -48,6 +50,10 @@ export default function Settings() {
     }
   };
 
+  const handleLanguageChange = (value: string) => {
+    setLanguage(value as Language);
+  };
+
   if (!pet) {
     return (
       <div className="fixed inset-0 flex items-center justify-center bg-background">
@@ -62,6 +68,7 @@ export default function Settings() {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.3 }}
+      dir={isRTL ? 'rtl' : 'ltr'}
     >
       <motion.div 
         className="relative w-full max-w-[450px] aspect-[9/19] bg-card rounded-[3rem] shadow-2xl overflow-hidden flex flex-col border border-white/5"
@@ -76,9 +83,9 @@ export default function Settings() {
             onClick={() => setLocation("/")}
             data-testid="button-back"
           >
-            <ArrowLeft className="w-6 h-6" />
+            <ArrowLeft className={`w-6 h-6 ${isRTL ? 'rotate-180' : ''}`} />
           </Button>
-          <h1 className="text-2xl font-display font-bold">Settings</h1>
+          <h1 className="text-2xl font-display font-bold">{t.settings.title}</h1>
         </div>
 
         <div className="flex-1 overflow-y-auto px-6 py-6 space-y-6">
@@ -91,17 +98,17 @@ export default function Settings() {
               <CardHeader className="pb-3">
                 <CardTitle className="flex items-center gap-2 text-lg">
                   <User className="w-5 h-5 text-primary" />
-                  Pet Name
+                  {t.settings.petName}
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="pet-name">What should we call your friend?</Label>
+                  <Label htmlFor="pet-name">{t.settings.whatShouldWeCall}</Label>
                   <Input
                     id="pet-name"
                     value={petName}
                     onChange={(e) => setPetName(e.target.value)}
-                    placeholder="Enter a name..."
+                    placeholder={t.settings.enterName}
                     className="h-12 text-lg rounded-xl"
                     data-testid="input-pet-name"
                   />
@@ -112,8 +119,8 @@ export default function Settings() {
                   className="w-full h-12 rounded-xl"
                   data-testid="button-save-name"
                 >
-                  <Save className="w-5 h-5 mr-2" />
-                  {renameMutation.isPending ? "Saving..." : "Save Name"}
+                  <Save className={`w-5 h-5 ${isRTL ? 'ml-2' : 'mr-2'}`} />
+                  {renameMutation.isPending ? t.settings.saving : t.settings.saveName}
                 </Button>
               </CardContent>
             </Card>
@@ -128,18 +135,18 @@ export default function Settings() {
               <CardHeader className="pb-3">
                 <CardTitle className="flex items-center gap-2 text-lg">
                   <Globe className="w-5 h-5 text-primary" />
-                  Language
+                  {t.settings.language}
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <Select value={language} onValueChange={setLanguage}>
+                <Select value={language} onValueChange={handleLanguageChange}>
                   <SelectTrigger className="h-12 rounded-xl" data-testid="select-language">
-                    <SelectValue placeholder="Select language" />
+                    <SelectValue placeholder={t.settings.selectLanguage} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="ar">Arabic</SelectItem>
-                    <SelectItem value="en">English</SelectItem>
-                    <SelectItem value="he">Hebrew</SelectItem>
+                    <SelectItem value="ar">{t.settings.arabic}</SelectItem>
+                    <SelectItem value="en">{t.settings.english}</SelectItem>
+                    <SelectItem value="he">{t.settings.hebrew}</SelectItem>
                   </SelectContent>
                 </Select>
               </CardContent>
@@ -155,14 +162,14 @@ export default function Settings() {
               <CardHeader className="pb-3">
                 <CardTitle className="flex items-center gap-2 text-lg">
                   <Volume2 className="w-5 h-5 text-primary" />
-                  Sound & Notifications
+                  {t.settings.soundNotifications}
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="flex items-center justify-between">
                   <Label htmlFor="sound-toggle" className="flex items-center gap-2">
                     <Volume2 className="w-4 h-4 text-muted-foreground" />
-                    Sound Effects
+                    {t.settings.soundEffects}
                   </Label>
                   <Switch 
                     id="sound-toggle" 
@@ -174,7 +181,7 @@ export default function Settings() {
                 <div className="flex items-center justify-between">
                   <Label htmlFor="notifications-toggle" className="flex items-center gap-2">
                     <Bell className="w-4 h-4 text-muted-foreground" />
-                    Notifications
+                    {t.settings.notifications}
                   </Label>
                   <Switch 
                     id="notifications-toggle" 
@@ -196,13 +203,13 @@ export default function Settings() {
               <CardHeader className="pb-3">
                 <CardTitle className="flex items-center gap-2 text-lg">
                   <Info className="w-5 h-5 text-primary" />
-                  About
+                  {t.settings.about}
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-2 text-sm text-muted-foreground">
-                <p><span className="font-medium text-foreground">DiaPet</span> v1.0.0</p>
-                <p>A fun way to learn about diabetes management!</p>
-                <p className="text-xs">Made with love for kids everywhere.</p>
+                <p><span className="font-medium text-foreground">DiaPet</span> {t.settings.version}</p>
+                <p>{t.settings.description}</p>
+                <p className="text-xs">{t.settings.madeWithLove}</p>
               </CardContent>
             </Card>
           </motion.div>
