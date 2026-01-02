@@ -57,8 +57,18 @@ export default function Settings() {
   }
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-background overflow-hidden p-4">
-      <div className="relative w-full max-w-[450px] aspect-[9/19] bg-card rounded-[3rem] shadow-2xl overflow-hidden flex flex-col border border-white/5">
+    <motion.div 
+      className="fixed inset-0 flex items-center justify-center bg-background overflow-hidden p-4"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.3 }}
+    >
+      <motion.div 
+        className="relative w-full max-w-[450px] aspect-[9/19] bg-card rounded-[3rem] shadow-2xl overflow-hidden flex flex-col border border-white/5"
+        initial={{ scale: 0.95, y: 20 }}
+        animate={{ scale: 1, y: 0 }}
+        transition={{ duration: 0.3, ease: "easeOut" }}
+      >
         <div className="pt-12 px-6 pb-4 flex items-center gap-4 border-b border-white/10">
           <Button 
             variant="ghost" 
@@ -200,7 +210,7 @@ export default function Settings() {
             </Card>
           </motion.div>
         </div>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 }
