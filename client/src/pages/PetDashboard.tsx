@@ -5,6 +5,7 @@ import { StatusIndicator } from "@/components/StatusIndicator";
 import { FoodSelector } from "@/components/FoodSelector";
 import { InsulinControl } from "@/components/InsulinControl";
 import { GamesMenu } from "@/components/GamesMenu";
+import { Shop } from "@/pages/Shop";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
@@ -43,6 +44,7 @@ export function PetDashboard({ pet }: PetDashboardProps) {
   const [showChallengeComplete, setShowChallengeComplete] = useState(false);
   const [gamesMenuOpen, setGamesMenuOpen] = useState(false);
   const [monitorOn, setMonitorOn] = useState(false);
+  const [shopOpen, setShopOpen] = useState(false);
   const lastScenarioRef = useRef<string | null>(null);
   const challengeIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -512,6 +514,7 @@ export function PetDashboard({ pet }: PetDashboardProps) {
                 variant="ghost" 
                 size="icon" 
                 className="w-10 h-10 text-muted-foreground"
+                onClick={() => setShopOpen(true)}
                 data-testid="button-cart"
               >
                 <ShoppingCart className="w-5 h-5" />
@@ -669,6 +672,12 @@ export function PetDashboard({ pet }: PetDashboardProps) {
         <AnimatePresence>
           {gamesMenuOpen && (
             <GamesMenu isOpen={gamesMenuOpen} onClose={() => setGamesMenuOpen(false)} petId={pet.id} />
+          )}
+        </AnimatePresence>
+
+        <AnimatePresence>
+          {shopOpen && (
+            <Shop pet={pet} onClose={() => setShopOpen(false)} />
           )}
         </AnimatePresence>
 
