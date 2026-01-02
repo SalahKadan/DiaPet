@@ -34,7 +34,7 @@ export function PetDashboard({ pet }: PetDashboardProps) {
   const [cooldownRemaining, setCooldownRemaining] = useState(0);
   const [showBloodTestAnimation, setShowBloodTestAnimation] = useState(false);
   const [bloodTestPhase, setBloodTestPhase] = useState<'idle' | 'finger' | 'testing' | 'result' | 'reward'>('idle');
-  const [earnedCoin, setEarnedCoin] = useState(false);
+  const [earnedCoin, setEarnedCoin] = useState<number | null>(null);
   const [showLevelUp, setShowLevelUp] = useState(false);
   const [newLevel, setNewLevel] = useState(0);
   const [showChallengeComplete, setShowChallengeComplete] = useState(false);
@@ -195,10 +195,14 @@ export function PetDashboard({ pet }: PetDashboardProps) {
       queryClient.invalidateQueries({ queryKey: ["/api/pets"] });
       if (data.success) {
         setBloodTestPhase('reward');
-        setEarnedCoin(true);
-        setBloodTestMessage("Great job! You earned a coin!");
+        setEarnedCoin(data.coinsEarned);
+        if (data.isBloodSugarBad) {
+          setBloodTestMessage("Blood sugar is out of range! You lost a coin.");
+        } else {
+          setBloodTestMessage("Great job! You earned a coin!");
+        }
         setTimeout(() => {
-          setEarnedCoin(false);
+          setEarnedCoin(null);
           setShowBloodTestAnimation(false);
           setBloodTestPhase('idle');
           setBloodTestMessage(null);
@@ -366,14 +370,16 @@ export function PetDashboard({ pet }: PetDashboardProps) {
                   {bloodTestPhase === 'reward' && bloodTestMessage}
                 </motion.p>
 
-                {bloodTestPhase === 'reward' && earnedCoin && (
+                {bloodTestPhase === 'reward' && earnedCoin !== null && (
                   <motion.div
                     initial={{ scale: 0 }}
                     animate={{ scale: 1 }}
                     className="flex items-center justify-center gap-2"
                   >
-                    <Coins className="w-8 h-8 text-yellow-500" />
-                    <span className="text-2xl font-bold text-yellow-600">+1</span>
+                    <Coins className={`w-8 h-8 ${earnedCoin > 0 ? 'text-yellow-500' : 'text-red-500'}`} />
+                    <span className={`text-2xl font-bold ${earnedCoin > 0 ? 'text-yellow-600' : 'text-red-600'}`}>
+                      {earnedCoin > 0 ? '+1' : '-1'}
+                    </span>
                   </motion.div>
                 )}
               </div>
@@ -478,14 +484,14 @@ export function PetDashboard({ pet }: PetDashboardProps) {
               <Coins className="w-4 h-4 text-yellow-600" />
               <span className="text-sm font-bold text-yellow-700 dark:text-yellow-300" data-testid="text-coins">{pet.coins || 0}</span>
               <AnimatePresence>
-                {earnedCoin && (
+                {earnedCoin !== null && (
                   <motion.span
                     initial={{ opacity: 0, y: 10, scale: 0.5 }}
                     animate={{ opacity: 1, y: 0, scale: 1 }}
                     exit={{ opacity: 0, y: -10 }}
-                    className="text-xs font-bold text-green-600"
+                    className={`text-xs font-bold ${earnedCoin > 0 ? 'text-green-600' : 'text-red-600'}`}
                   >
-                    +1
+                    {earnedCoin > 0 ? '+1' : '-1'}
                   </motion.span>
                 )}
               </AnimatePresence>

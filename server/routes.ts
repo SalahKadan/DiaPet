@@ -252,16 +252,22 @@ export async function registerRoutes(
       newExp = newExp - levelThreshold;
     }
 
+    // Check if blood sugar is in a bad range
+    const isBloodSugarBad = pet.bloodSugar < 70 || pet.bloodSugar > 180;
+    const coinChange = isBloodSugarBad ? -1 : 1;
+    const newCoins = Math.max(0, (pet.coins || 0) + coinChange);
+
     updates.experience = newExp;
     updates.level = newLevel;
-    updates.coins = (pet.coins || 0) + 1;
+    updates.coins = newCoins;
     updates.lastBloodTest = now;
 
     const updatedPet = await storage.updatePet(petId, updates);
     res.json({ 
       success: true, 
       cooldown: false,
-      coinsEarned: 1,
+      coinsEarned: coinChange,
+      isBloodSugarBad,
       pet: updatedPet 
     });
   });
