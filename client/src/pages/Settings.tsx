@@ -137,12 +137,9 @@ export default function Settings() {
                     <SelectValue placeholder="Select language" />
                   </SelectTrigger>
                   <SelectContent>
+                    <SelectItem value="ar">Arabic</SelectItem>
                     <SelectItem value="en">English</SelectItem>
-                    <SelectItem value="es">Spanish</SelectItem>
-                    <SelectItem value="fr">French</SelectItem>
-                    <SelectItem value="de">German</SelectItem>
-                    <SelectItem value="zh">Chinese</SelectItem>
-                    <SelectItem value="ja">Japanese</SelectItem>
+                    <SelectItem value="he">Hebrew</SelectItem>
                   </SelectContent>
                 </Select>
               </CardContent>
