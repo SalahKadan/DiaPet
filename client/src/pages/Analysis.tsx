@@ -68,16 +68,16 @@ export default function Analysis() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white dark:from-gray-900 dark:to-gray-800 flex items-center justify-center">
-        <div className="animate-pulse text-primary">Loading analysis...</div>
+      <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-950 flex items-center justify-center">
+        <div className="animate-pulse text-blue-400">Loading analysis...</div>
       </div>
     );
   }
 
   if (!pet) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white dark:from-gray-900 dark:to-gray-800 flex items-center justify-center">
-        <p>No pet found</p>
+      <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-950 flex items-center justify-center">
+        <p className="text-gray-400">No pet found</p>
       </div>
     );
   }
@@ -108,13 +108,13 @@ export default function Analysis() {
   const BloodSugarTrendIcon = bloodSugarTrend.icon;
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white dark:from-gray-900 dark:to-gray-800 p-4 pb-24">
+    <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-950 p-4 pb-24">
       <div className="max-w-lg mx-auto space-y-6">
         <div className="flex items-center gap-4">
-          <Button variant="ghost" size="icon" onClick={() => window.location.href = "/pet"} data-testid="button-back">
+          <Button variant="ghost" size="icon" onClick={() => window.location.href = "/pet"} className="text-gray-300 hover:text-white" data-testid="button-back">
             <ArrowLeft className="w-5 h-5" />
           </Button>
-          <h1 className="text-2xl font-display font-bold text-primary">Health Analysis</h1>
+          <h1 className="text-2xl font-display font-bold text-blue-400">Health Analysis</h1>
         </div>
 
         <motion.div
@@ -122,24 +122,24 @@ export default function Analysis() {
           animate={{ opacity: 1, y: 0 }}
           className="grid grid-cols-2 gap-4"
         >
-          <Card className="bg-gradient-to-br from-pink-50 to-white dark:from-pink-900/20 dark:to-gray-800">
+          <Card className="bg-gradient-to-br from-pink-900/40 to-gray-800 border-pink-800/50">
             <CardContent className="p-4">
               <div className="flex items-center gap-2 mb-2">
-                <Heart className="w-4 h-4 text-pink-500" />
-                <span className="text-xs text-muted-foreground">Health</span>
+                <Heart className="w-4 h-4 text-pink-400" />
+                <span className="text-xs text-gray-400">Health</span>
               </div>
               <div className={`text-2xl font-bold ${getStatusColor(pet.health, 'stat')}`}>
                 {pet.health}%
               </div>
-              <div className="text-xs text-muted-foreground">Avg: {avgHealth}%</div>
+              <div className="text-xs text-gray-500">Avg: {avgHealth}%</div>
             </CardContent>
           </Card>
 
-          <Card className="bg-gradient-to-br from-red-50 to-white dark:from-red-900/20 dark:to-gray-800">
+          <Card className="bg-gradient-to-br from-red-900/40 to-gray-800 border-red-800/50">
             <CardContent className="p-4">
               <div className="flex items-center gap-2 mb-2">
-                <Activity className="w-4 h-4 text-red-500" />
-                <span className="text-xs text-muted-foreground">Blood Sugar</span>
+                <Activity className="w-4 h-4 text-red-400" />
+                <span className="text-xs text-gray-400">Blood Sugar</span>
               </div>
               <div className={`text-2xl font-bold ${getStatusColor(pet.bloodSugar, 'bloodSugar')}`}>
                 {pet.bloodSugar}
@@ -151,11 +151,11 @@ export default function Analysis() {
             </CardContent>
           </Card>
 
-          <Card className="bg-gradient-to-br from-orange-50 to-white dark:from-orange-900/20 dark:to-gray-800">
+          <Card className="bg-gradient-to-br from-orange-900/40 to-gray-800 border-orange-800/50">
             <CardContent className="p-4">
               <div className="flex items-center gap-2 mb-2">
-                <Utensils className="w-4 h-4 text-orange-500" />
-                <span className="text-xs text-muted-foreground">Hunger</span>
+                <Utensils className="w-4 h-4 text-orange-400" />
+                <span className="text-xs text-gray-400">Hunger</span>
               </div>
               <div className={`text-2xl font-bold ${getStatusColor(pet.hunger, 'stat')}`}>
                 {pet.hunger}%
@@ -163,11 +163,11 @@ export default function Analysis() {
             </CardContent>
           </Card>
 
-          <Card className="bg-gradient-to-br from-yellow-50 to-white dark:from-yellow-900/20 dark:to-gray-800">
+          <Card className="bg-gradient-to-br from-yellow-900/40 to-gray-800 border-yellow-800/50">
             <CardContent className="p-4">
               <div className="flex items-center gap-2 mb-2">
-                <Zap className="w-4 h-4 text-yellow-500" />
-                <span className="text-xs text-muted-foreground">Energy</span>
+                <Zap className="w-4 h-4 text-yellow-400" />
+                <span className="text-xs text-gray-400">Energy</span>
               </div>
               <div className={`text-2xl font-bold ${getStatusColor(pet.energy, 'stat')}`}>
                 {pet.energy}%
@@ -181,10 +181,10 @@ export default function Analysis() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
         >
-          <Card>
+          <Card className="bg-gray-800/80 border-gray-700">
             <CardHeader className="pb-2">
-              <CardTitle className="text-lg flex items-center gap-2">
-                <Activity className="w-5 h-5 text-primary" />
+              <CardTitle className="text-lg flex items-center gap-2 text-gray-100">
+                <Activity className="w-5 h-5 text-red-400" />
                 Blood Sugar History (24h)
               </CardTitle>
             </CardHeader>
@@ -194,19 +194,20 @@ export default function Analysis() {
                   <AreaChart data={history}>
                     <defs>
                       <linearGradient id="bloodSugarGradient" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#ef4444" stopOpacity={0.3}/>
+                        <stop offset="5%" stopColor="#ef4444" stopOpacity={0.4}/>
                         <stop offset="95%" stopColor="#ef4444" stopOpacity={0}/>
                       </linearGradient>
                     </defs>
-                    <CartesianGrid strokeDasharray="3 3" opacity={0.3} />
-                    <XAxis dataKey="time" tick={{ fontSize: 10 }} interval="preserveStartEnd" />
-                    <YAxis domain={[50, 300]} tick={{ fontSize: 10 }} />
+                    <CartesianGrid strokeDasharray="3 3" stroke="#374151" opacity={0.5} />
+                    <XAxis dataKey="time" tick={{ fontSize: 10, fill: '#9ca3af' }} interval="preserveStartEnd" />
+                    <YAxis domain={[50, 300]} tick={{ fontSize: 10, fill: '#9ca3af' }} />
                     <Tooltip 
                       contentStyle={{ 
-                        backgroundColor: 'rgba(255,255,255,0.95)', 
+                        backgroundColor: 'rgba(31,41,55,0.95)', 
                         borderRadius: '12px',
-                        border: 'none',
-                        boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
+                        border: '1px solid #374151',
+                        boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
+                        color: '#f3f4f6'
                       }} 
                     />
                     <Area 
@@ -221,12 +222,12 @@ export default function Analysis() {
               </div>
               <div className="flex justify-center gap-6 mt-2 text-xs">
                 <div className="flex items-center gap-1">
-                  <div className="w-3 h-3 bg-green-200 rounded" />
-                  <span className="text-muted-foreground">Normal (70-180)</span>
+                  <div className="w-3 h-3 bg-green-600 rounded" />
+                  <span className="text-gray-400">Normal (70-180)</span>
                 </div>
                 <div className="flex items-center gap-1">
-                  <div className="w-3 h-3 bg-red-200 rounded" />
-                  <span className="text-muted-foreground">High (&gt;180)</span>
+                  <div className="w-3 h-3 bg-red-600 rounded" />
+                  <span className="text-gray-400">High (&gt;180)</span>
                 </div>
               </div>
             </CardContent>
@@ -238,10 +239,10 @@ export default function Analysis() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
         >
-          <Card>
+          <Card className="bg-gray-800/80 border-gray-700">
             <CardHeader className="pb-2">
-              <CardTitle className="text-lg flex items-center gap-2">
-                <Heart className="w-5 h-5 text-pink-500" />
+              <CardTitle className="text-lg flex items-center gap-2 text-gray-100">
+                <Heart className="w-5 h-5 text-pink-400" />
                 Vitals Overview (24h)
               </CardTitle>
             </CardHeader>
@@ -249,18 +250,19 @@ export default function Analysis() {
               <div className="h-48">
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart data={history}>
-                    <CartesianGrid strokeDasharray="3 3" opacity={0.3} />
-                    <XAxis dataKey="time" tick={{ fontSize: 10 }} interval="preserveStartEnd" />
-                    <YAxis domain={[0, 100]} tick={{ fontSize: 10 }} />
+                    <CartesianGrid strokeDasharray="3 3" stroke="#374151" opacity={0.5} />
+                    <XAxis dataKey="time" tick={{ fontSize: 10, fill: '#9ca3af' }} interval="preserveStartEnd" />
+                    <YAxis domain={[0, 100]} tick={{ fontSize: 10, fill: '#9ca3af' }} />
                     <Tooltip 
                       contentStyle={{ 
-                        backgroundColor: 'rgba(255,255,255,0.95)', 
+                        backgroundColor: 'rgba(31,41,55,0.95)', 
                         borderRadius: '12px',
-                        border: 'none',
-                        boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
+                        border: '1px solid #374151',
+                        boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
+                        color: '#f3f4f6'
                       }} 
                     />
-                    <Legend />
+                    <Legend wrapperStyle={{ color: '#9ca3af' }} />
                     <Line type="monotone" dataKey="health" stroke="#ec4899" strokeWidth={2} dot={false} />
                     <Line type="monotone" dataKey="hunger" stroke="#f97316" strokeWidth={2} dot={false} />
                     <Line type="monotone" dataKey="energy" stroke="#eab308" strokeWidth={2} dot={false} />
@@ -276,11 +278,11 @@ export default function Analysis() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
         >
-          <Card className="bg-gradient-to-br from-purple-50 to-white dark:from-purple-900/20 dark:to-gray-800">
+          <Card className="bg-gradient-to-br from-purple-900/40 to-gray-800 border-purple-800/50">
             <CardHeader className="pb-2">
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-lg flex items-center gap-2">
-                  <Brain className="w-5 h-5 text-purple-500" />
+              <div className="flex items-center justify-between gap-2">
+                <CardTitle className="text-lg flex items-center gap-2 text-gray-100">
+                  <Brain className="w-5 h-5 text-purple-400" />
                   AI Recommendations
                 </CardTitle>
                 <Button 
@@ -288,6 +290,7 @@ export default function Analysis() {
                   size="sm" 
                   onClick={fetchRecommendations}
                   disabled={isLoadingRecs}
+                  className="text-gray-400 hover:text-white"
                   data-testid="button-get-recommendations"
                 >
                   <RefreshCw className={`w-4 h-4 ${isLoadingRecs ? 'animate-spin' : ''}`} />
@@ -297,19 +300,19 @@ export default function Analysis() {
             <CardContent>
               {recommendations.length === 0 && !isLoadingRecs ? (
                 <div className="text-center py-6">
-                  <Brain className="w-12 h-12 mx-auto text-purple-300 mb-3" />
-                  <p className="text-sm text-muted-foreground mb-4">
+                  <Brain className="w-12 h-12 mx-auto text-purple-500/50 mb-3" />
+                  <p className="text-sm text-gray-400 mb-4">
                     Get personalized recommendations based on your pet's health patterns
                   </p>
-                  <Button onClick={fetchRecommendations} className="bg-purple-500 hover:bg-purple-600" data-testid="button-analyze">
+                  <Button onClick={fetchRecommendations} className="bg-purple-600 hover:bg-purple-700" data-testid="button-analyze">
                     <Brain className="w-4 h-4 mr-2" />
                     Analyze Patterns
                   </Button>
                 </div>
               ) : isLoadingRecs ? (
                 <div className="text-center py-6">
-                  <RefreshCw className="w-8 h-8 mx-auto text-purple-500 animate-spin mb-3" />
-                  <p className="text-sm text-muted-foreground">Analyzing health patterns...</p>
+                  <RefreshCw className="w-8 h-8 mx-auto text-purple-400 animate-spin mb-3" />
+                  <p className="text-sm text-gray-400">Analyzing health patterns...</p>
                 </div>
               ) : (
                 <div className="space-y-3">
@@ -319,12 +322,12 @@ export default function Analysis() {
                       initial={{ opacity: 0, x: -20 }}
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: index * 0.1 }}
-                      className="flex items-start gap-3 p-3 bg-white dark:bg-gray-800 rounded-xl"
+                      className="flex items-start gap-3 p-3 bg-gray-700/50 rounded-xl"
                     >
-                      <div className="w-6 h-6 bg-purple-100 dark:bg-purple-900/50 rounded-full flex items-center justify-center shrink-0">
-                        <span className="text-xs font-bold text-purple-600">{index + 1}</span>
+                      <div className="w-6 h-6 bg-purple-900/50 rounded-full flex items-center justify-center shrink-0">
+                        <span className="text-xs font-bold text-purple-400">{index + 1}</span>
                       </div>
-                      <p className="text-sm text-foreground">{rec}</p>
+                      <p className="text-sm text-gray-200">{rec}</p>
                     </motion.div>
                   ))}
                 </div>
@@ -338,27 +341,27 @@ export default function Analysis() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
         >
-          <Card>
+          <Card className="bg-gray-800/80 border-gray-700">
             <CardHeader className="pb-2">
-              <CardTitle className="text-lg">Quick Stats</CardTitle>
+              <CardTitle className="text-lg text-gray-100">Quick Stats</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-2 gap-4 text-sm">
                 <div>
-                  <p className="text-muted-foreground">Level</p>
-                  <p className="font-bold text-lg">{pet.level}</p>
+                  <p className="text-gray-400">Level</p>
+                  <p className="font-bold text-lg text-gray-100">{pet.level}</p>
                 </div>
                 <div>
-                  <p className="text-muted-foreground">Experience</p>
-                  <p className="font-bold text-lg">{pet.experience}/100 XP</p>
+                  <p className="text-gray-400">Experience</p>
+                  <p className="font-bold text-lg text-gray-100">{pet.experience}/100 XP</p>
                 </div>
                 <div>
-                  <p className="text-muted-foreground">Coins</p>
-                  <p className="font-bold text-lg">{pet.coins}</p>
+                  <p className="text-gray-400">Coins</p>
+                  <p className="font-bold text-lg text-yellow-400">{pet.coins}</p>
                 </div>
                 <div>
-                  <p className="text-muted-foreground">Mood</p>
-                  <p className="font-bold text-lg capitalize">{pet.mood}</p>
+                  <p className="text-gray-400">Mood</p>
+                  <p className="font-bold text-lg text-gray-100 capitalize">{pet.mood}</p>
                 </div>
               </div>
             </CardContent>
