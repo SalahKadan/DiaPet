@@ -236,8 +236,37 @@ export function PetAvatar({ pet, className }: PetAvatarProps) {
         </svg>
       </motion.div>
       
-      <div className="absolute -bottom-4 bg-primary text-primary-foreground px-6 py-2 rounded-full font-display text-xl font-bold shadow-lg border-4 border-white">
-        {pet.name}
+      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-full flex justify-center pointer-events-none">
+        <svg viewBox="0 0 200 60" className="w-64 h-20 -mt-4">
+          <defs>
+            <linearGradient id="pillowGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stopColor="#EF4444" />
+              <stop offset="50%" stopColor="#DC2626" />
+              <stop offset="100%" stopColor="#B91C1C" />
+            </linearGradient>
+            <filter id="pillowShadow" x="-20%" y="-20%" width="140%" height="140%">
+              <feDropShadow dx="0" dy="3" stdDeviation="4" floodOpacity="0.2"/>
+            </filter>
+            <filter id="cloudBlur" x="-10%" y="-10%" width="120%" height="120%">
+              <feGaussianBlur stdDeviation="1"/>
+            </filter>
+          </defs>
+          
+          <ellipse cx="100" cy="35" rx="88" ry="22" fill="url(#pillowGrad)" filter="url(#pillowShadow)" />
+          
+          <ellipse cx="25" cy="32" rx="22" ry="16" fill="white" opacity="0.9" filter="url(#cloudBlur)" />
+          <ellipse cx="12" cy="35" rx="14" ry="10" fill="white" opacity="0.8" />
+          <ellipse cx="35" cy="28" rx="12" ry="9" fill="white" opacity="0.7" />
+          
+          <ellipse cx="175" cy="32" rx="22" ry="16" fill="white" opacity="0.9" filter="url(#cloudBlur)" />
+          <ellipse cx="188" cy="35" rx="14" ry="10" fill="white" opacity="0.8" />
+          <ellipse cx="165" cy="28" rx="12" ry="9" fill="white" opacity="0.7" />
+          
+          <ellipse cx="55" cy="42" rx="10" ry="7" fill="white" opacity="0.6" />
+          <ellipse cx="145" cy="42" rx="10" ry="7" fill="white" opacity="0.6" />
+          
+          <ellipse cx="100" cy="30" rx="50" ry="10" fill="#FCA5A5" opacity="0.3" />
+        </svg>
       </div>
     </div>
   );
