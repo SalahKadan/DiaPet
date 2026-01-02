@@ -12,11 +12,14 @@ interface InsulinControlProps {
 export function InsulinControl({ onAdminister, isPending, currentBloodSugar }: InsulinControlProps) {
   const [units, setUnits] = useState(1);
   
+  const targetBloodSugar = 120;
   const isBloodSugarHigh = currentBloodSugar > 180;
   const isBloodSugarVeryHigh = currentBloodSugar > 250;
   const isBloodSugarLow = currentBloodSugar < 100;
   
-  const recommendedDose = isBloodSugarVeryHigh ? 3 : isBloodSugarHigh ? 2 : 1;
+  const excessSugar = currentBloodSugar - targetBloodSugar;
+  const calculatedDose = Math.ceil(excessSugar / 10);
+  const recommendedDose = Math.max(1, Math.min(5, calculatedDose));
   
   const getStatusMessage = () => {
     if (isBloodSugarLow) {
