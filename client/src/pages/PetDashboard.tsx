@@ -8,7 +8,7 @@ import { GamesMenu } from "@/components/GamesMenu";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { Heart, Zap, Utensils, Moon, Sun, MessageCircle, Activity, BarChart3, Gamepad2, Syringe, Coins, Clock, Settings, ShoppingCart } from "lucide-react";
+import { Heart, Zap, Utensils, Moon, Sun, MessageCircle, Activity, BarChart3, Gamepad2, Syringe, Coins, Clock, Settings, ShoppingCart, Monitor } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useMutation } from "@tanstack/react-query";
@@ -40,6 +40,7 @@ export function PetDashboard({ pet }: PetDashboardProps) {
   const [newLevel, setNewLevel] = useState(0);
   const [showChallengeComplete, setShowChallengeComplete] = useState(false);
   const [gamesMenuOpen, setGamesMenuOpen] = useState(false);
+  const [monitorOn, setMonitorOn] = useState(false);
   const lastScenarioRef = useRef<string | null>(null);
   const challengeIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -504,14 +505,25 @@ export function PetDashboard({ pet }: PetDashboardProps) {
                 </div>
               )}
             </div>
-            <Button 
-              variant="ghost" 
-              size="icon" 
-              className="w-10 h-10 text-muted-foreground"
-              data-testid="button-cart"
-            >
-              <ShoppingCart className="w-5 h-5" />
-            </Button>
+            <div className="flex flex-col gap-1">
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                className="w-10 h-10 text-muted-foreground"
+                data-testid="button-cart"
+              >
+                <ShoppingCart className="w-5 h-5" />
+              </Button>
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                className={`w-10 h-10 ${monitorOn ? 'text-green-500' : 'text-red-500'}`}
+                onClick={() => setMonitorOn(!monitorOn)}
+                data-testid="button-monitor"
+              >
+                <Monitor className="w-5 h-5" />
+              </Button>
+            </div>
           </div>
         </div>
 
