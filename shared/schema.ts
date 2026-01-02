@@ -24,6 +24,7 @@ export const pets = pgTable("pets", {
   coins: integer("coins").notNull().default(0),
   activeScenario: text("active_scenario"),
   scenarioDescription: text("scenario_description"),
+  lastChallengeAt: timestamp("last_challenge_at"),
   lastFed: timestamp("last_fed").defaultNow(),
   lastInsulin: timestamp("last_insulin").defaultNow(),
   lastBloodTest: timestamp("last_blood_test"),

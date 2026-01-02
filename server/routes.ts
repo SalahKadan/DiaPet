@@ -165,11 +165,17 @@ export async function registerRoutes(
           updates.mood = "happy";
           updates.bloodSugar = Math.max(0, pet.bloodSugar - 5);
           
-          // Trigger a challenge with stat effects when playing (if no active challenge)
-          if (!pet.activeScenario) {
+          // Trigger a challenge every 30 seconds (if no active challenge)
+          const now = new Date();
+          const challengeCooldown = 30 * 1000; // 30 seconds
+          const lastChallenge = pet.lastChallengeAt ? new Date(pet.lastChallengeAt).getTime() : 0;
+          const canStartChallenge = !pet.activeScenario && (now.getTime() - lastChallenge >= challengeCooldown);
+          
+          if (canStartChallenge) {
             const challenge = challengeTemplates[Math.floor(Math.random() * challengeTemplates.length)];
             updates.activeScenario = challenge.id;
             updates.scenarioDescription = challenge.desc;
+            updates.lastChallengeAt = now;
             
             // Apply stat effects from the challenge
             if (challenge.effects.bloodSugar) {
