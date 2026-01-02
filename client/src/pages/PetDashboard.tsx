@@ -148,24 +148,24 @@ export function PetDashboard({ pet }: PetDashboardProps) {
     const isUnhealthy = pet.health < 50;
 
     if (isBloodSugarLow) {
-      instructions.push("My blood sugar is too low! Give me a snack to bring it up.");
+      instructions.push(t.dashboard.bloodSugarLowHelp);
     }
     if (isBloodSugarHigh) {
-      instructions.push("My blood sugar is too high! I need some insulin to bring it down.");
+      instructions.push(t.dashboard.bloodSugarHighHelp);
     }
     if (isHungry && !isBloodSugarHigh) {
-      instructions.push("I'm getting hungry! Feed me something yummy.");
+      instructions.push(t.dashboard.hungryHelp);
     }
     if (isTired) {
-      instructions.push("I'm feeling tired. Let me take a nap to restore my energy.");
+      instructions.push(t.dashboard.tiredHelp);
     }
     if (isUnhealthy) {
       if (isBloodSugarLow) {
-        instructions.push("My health is dropping because my blood sugar is low. Food will help restore my HP!");
+        instructions.push(t.dashboard.healthLowBSLow);
       } else if (isBloodSugarHigh) {
-        instructions.push("My health is dropping because my blood sugar is high. Insulin will help restore my HP!");
+        instructions.push(t.dashboard.healthLowBSHigh);
       } else {
-        instructions.push("My health is low. Keep my blood sugar in the green zone (70-180) and I'll feel better!");
+        instructions.push(t.dashboard.healthLowGeneral);
       }
     }
     
@@ -198,9 +198,9 @@ export function PetDashboard({ pet }: PetDashboardProps) {
         setBloodTestPhase('reward');
         setEarnedCoin(data.coinsEarned);
         if (data.isBloodSugarBad) {
-          setBloodTestMessage("Blood sugar is out of range! You lost a coin.");
+          setBloodTestMessage(t.dashboard.lostCoin);
         } else {
-          setBloodTestMessage("Great job! You earned a coin!");
+          setBloodTestMessage(t.dashboard.earnedCoin);
         }
         setTimeout(() => {
           setEarnedCoin(null);
@@ -209,7 +209,7 @@ export function PetDashboard({ pet }: PetDashboardProps) {
           setBloodTestMessage(null);
         }, 2000);
       } else if (data.cooldown) {
-        setBloodTestMessage(`Please wait ${data.remainingSeconds || 0} seconds before testing again.`);
+        setBloodTestMessage(t.dashboard.waitSeconds);
         setTimeout(() => {
           setShowBloodTestAnimation(false);
           setBloodTestPhase('idle');
@@ -568,7 +568,7 @@ export function PetDashboard({ pet }: PetDashboardProps) {
                   exit={{ opacity: 0, y: -10 }}
                   className="bg-amber-50 dark:bg-amber-900/30 backdrop-blur-sm rounded-2xl p-3 border border-amber-200 dark:border-amber-700/50 shadow-inner"
                 >
-                  <p className="text-[10px] uppercase tracking-widest text-amber-600 dark:text-amber-400 font-semibold mb-2">How to help me:</p>
+                  <p className="text-[10px] uppercase tracking-widest text-amber-600 dark:text-amber-400 font-semibold mb-2">{t.dashboard.howToHelp}</p>
                   <div className="space-y-1.5">
                     {careInstructions.map((instruction, index) => (
                       <p key={index} className="text-xs text-amber-800 dark:text-amber-200 leading-relaxed">
@@ -586,7 +586,7 @@ export function PetDashboard({ pet }: PetDashboardProps) {
                   className="bg-green-50 dark:bg-green-900/30 backdrop-blur-sm rounded-2xl p-3 border border-green-200 dark:border-green-700/50 shadow-inner"
                 >
                   <p className="text-sm text-green-700 dark:text-green-300 leading-relaxed">
-                    I'm feeling great! Keep up the good work!
+                    {t.dashboard.feelingGreat}
                   </p>
                 </motion.div>
               )}
@@ -604,7 +604,7 @@ export function PetDashboard({ pet }: PetDashboardProps) {
                 </Button>
               </DialogTrigger>
               <DialogContent className="max-w-[350px] rounded-3xl bg-card/95 backdrop-blur-xl border-white/10">
-                <h2 className="text-xl font-display text-center mb-4">Pick a Snack!</h2>
+                <h2 className="text-xl font-display text-center mb-4">{t.dashboard.pickSnack}</h2>
                 <FoodSelector onSelect={(foodId) => handleAction('feed', { foodId })} disabled={handleActionMutation.isPending} />
               </DialogContent>
             </Dialog>
@@ -615,7 +615,7 @@ export function PetDashboard({ pet }: PetDashboardProps) {
                 </Button>
               </DialogTrigger>
               <DialogContent className="max-w-[350px] rounded-3xl bg-card/95 backdrop-blur-xl border-white/10">
-                <h2 className="text-xl font-display text-center mb-4">Insulin Pump</h2>
+                <h2 className="text-xl font-display text-center mb-4">{t.dashboard.insulinPump}</h2>
                 <InsulinControl currentBloodSugar={pet.bloodSugar} isPending={handleActionMutation.isPending} onAdminister={(units) => handleAction('insulin', { insulinUnits: units })} />
               </DialogContent>
             </Dialog>
@@ -687,7 +687,7 @@ export function PetDashboard({ pet }: PetDashboardProps) {
                     {msg.text}
                   </div>
                 ))}
-                {chatPending && <div className="text-xs text-muted-foreground animate-pulse">Thinking...</div>}
+                {chatPending && <div className="text-xs text-muted-foreground animate-pulse">{t.dashboard.thinking}</div>}
               </div>
               <form onSubmit={handleChat} className="p-6 bg-muted/30 flex gap-2">
                 <Input value={chatInput} onChange={e => setChatInput(e.target.value)} placeholder={t.dashboard.saySmth} className="rounded-2xl h-14 bg-card border-none" />
@@ -726,7 +726,7 @@ export function PetDashboard({ pet }: PetDashboardProps) {
                   {bloodTestMutation.isPending ? t.dashboard.testing : t.dashboard.finishTest}
                 </Button>
                 <Button variant="ghost" onClick={() => setBloodTestOpen(false)} disabled={bloodTestMutation.isPending}>
-                  Not now
+                  {t.dashboard.notNow}
                 </Button>
               </div>
             </motion.div>
