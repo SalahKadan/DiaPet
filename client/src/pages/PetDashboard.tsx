@@ -4,6 +4,7 @@ import { PetAvatar } from "@/components/PetAvatar";
 import { StatusIndicator } from "@/components/StatusIndicator";
 import { FoodSelector } from "@/components/FoodSelector";
 import { InsulinControl } from "@/components/InsulinControl";
+import { GamesMenu } from "@/components/GamesMenu";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
@@ -38,6 +39,7 @@ export function PetDashboard({ pet }: PetDashboardProps) {
   const [showLevelUp, setShowLevelUp] = useState(false);
   const [newLevel, setNewLevel] = useState(0);
   const [showChallengeComplete, setShowChallengeComplete] = useState(false);
+  const [gamesMenuOpen, setGamesMenuOpen] = useState(false);
   const lastScenarioRef = useRef<string | null>(null);
   const challengeIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -600,7 +602,7 @@ export function PetDashboard({ pet }: PetDashboardProps) {
         </div>
 
         <div className="h-20 bg-muted/30 backdrop-blur-md flex items-center justify-around border-t border-white/5">
-          <Button variant="ghost" size="icon" className="w-12 h-12 text-muted-foreground hover:text-primary hover-elevate" onClick={() => handleAction('play')} disabled={actionPending || pet.isAsleep}>
+          <Button variant="ghost" size="icon" className="w-12 h-12 text-muted-foreground hover:text-primary hover-elevate" onClick={() => setGamesMenuOpen(true)} data-testid="button-games">
             <Gamepad2 className="w-6 h-6" />
           </Button>
           <Button 
@@ -639,6 +641,12 @@ export function PetDashboard({ pet }: PetDashboardProps) {
              <Settings className="w-6 h-6" />
           </Button>
         </div>
+
+        <AnimatePresence>
+          {gamesMenuOpen && (
+            <GamesMenu isOpen={gamesMenuOpen} onClose={() => setGamesMenuOpen(false)} petId={pet.id} />
+          )}
+        </AnimatePresence>
 
         <AnimatePresence>
           {chatOpen && (
