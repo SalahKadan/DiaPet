@@ -9,7 +9,7 @@ import { Shop } from "@/pages/Shop";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { Heart, Zap, Utensils, Moon, Sun, MessageCircle, Activity, BarChart3, Gamepad2, Syringe, Coins, Clock, Settings, ShoppingCart, Monitor } from "lucide-react";
+import { Heart, Zap, Utensils, Moon, Sun, MessageCircle, Activity, BarChart3, Gamepad2, Syringe, Coins, Clock, Settings, ShoppingCart, Monitor, Shirt, Ribbon, Crown, Glasses, PartyPopper, Circle, Wind, Sparkles, X } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useMutation, useQuery } from "@tanstack/react-query";
@@ -50,6 +50,7 @@ export function PetDashboard({ pet }: PetDashboardProps) {
   const [gamesMenuOpen, setGamesMenuOpen] = useState(false);
   const [monitorOn, setMonitorOn] = useState(false);
   const [shopOpen, setShopOpen] = useState(false);
+  const [closetOpen, setClosetOpen] = useState(false);
   const lastScenarioRef = useRef<string | null>(null);
   const challengeIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -61,6 +62,44 @@ export function PetDashboard({ pet }: PetDashboardProps) {
       return res.json();
     },
     refetchInterval: 10000,
+  });
+
+  interface OwnedItem {
+    id: number;
+    petId: number;
+    itemId: string;
+    equipped: boolean;
+  }
+
+  const { data: ownedItems = [] } = useQuery<OwnedItem[]>({
+    queryKey: ["/api/pets", pet.id, "owned-items"],
+    queryFn: async () => {
+      const res = await fetch(`/api/pets/${pet.id}/owned-items`);
+      if (!res.ok) throw new Error("Failed to fetch owned items");
+      return res.json();
+    },
+  });
+
+  const equipMutation = useMutation({
+    mutationFn: async (itemId: string) => {
+      const res = await apiRequest("POST", `/api/pets/${pet.id}/equip`, { itemId });
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/pets", pet.id, "owned-items"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/pets", pet.id, "equipped-items"] });
+    },
+  });
+
+  const unequipMutation = useMutation({
+    mutationFn: async (itemId: string) => {
+      const res = await apiRequest("POST", `/api/pets/${pet.id}/unequip`, { itemId });
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/pets", pet.id, "owned-items"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/pets", pet.id, "equipped-items"] });
+    },
   });
 
   useEffect(() => {
@@ -543,6 +582,15 @@ export function PetDashboard({ pet }: PetDashboardProps) {
               >
                 <Monitor className="w-5 h-5" />
               </Button>
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                className="w-10 h-10 text-purple-500"
+                onClick={() => setClosetOpen(true)}
+                data-testid="button-closet"
+              >
+                <Shirt className="w-5 h-5" />
+              </Button>
             </div>
           </div>
         </div>
@@ -693,6 +741,102 @@ export function PetDashboard({ pet }: PetDashboardProps) {
         <AnimatePresence>
           {shopOpen && (
             <Shop pet={pet} onClose={() => setShopOpen(false)} />
+          )}
+        </AnimatePresence>
+
+        <AnimatePresence>
+          {closetOpen && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="absolute inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4"
+              onClick={() => setClosetOpen(false)}
+            >
+              <motion.div
+                initial={{ scale: 0.9, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.9, opacity: 0 }}
+                className="bg-card rounded-3xl p-6 w-full max-w-sm max-h-[80vh] overflow-y-auto shadow-xl"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="text-xl font-display font-bold flex items-center gap-2">
+                    <Shirt className="w-5 h-5 text-purple-500" />
+                    {t.shop?.closet || "My Closet"}
+                  </h2>
+                  <Button variant="ghost" size="icon" onClick={() => setClosetOpen(false)} data-testid="button-closet-close">
+                    <X className="w-4 h-4" />
+                  </Button>
+                </div>
+                
+                {ownedItems.length === 0 ? (
+                  <div className="text-center py-8 text-muted-foreground">
+                    <Shirt className="w-12 h-12 mx-auto mb-3 opacity-30" />
+                    <p>{t.shop?.noItems || "No items yet!"}</p>
+                    <p className="text-sm mt-1">{t.shop?.visitShop || "Visit the shop to buy some"}</p>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-2 gap-3">
+                    {ownedItems.map((item) => {
+                      const itemNames: Record<string, string> = {
+                        bowtie: t.shop?.items?.bowtie || "Bowtie",
+                        crown: t.shop?.items?.crown || "Crown",
+                        glasses: t.shop?.items?.glasses || "Cool Glasses",
+                        hat: t.shop?.items?.hat || "Party Hat",
+                        collar: t.shop?.items?.collar || "Collar",
+                        scarf: t.shop?.items?.scarf || "Scarf",
+                        cape: t.shop?.items?.cape || "Cape",
+                        sweater: t.shop?.items?.sweater || "Sweater",
+                      };
+                      const ItemIcon = ({ id }: { id: string }) => {
+                        const iconClass = "w-8 h-8";
+                        switch (id) {
+                          case "bowtie": return <Ribbon className={`${iconClass} text-pink-500`} />;
+                          case "crown": return <Crown className={`${iconClass} text-yellow-500`} />;
+                          case "glasses": return <Glasses className={`${iconClass} text-blue-500`} />;
+                          case "hat": return <PartyPopper className={`${iconClass} text-purple-500`} />;
+                          case "collar": return <Circle className={`${iconClass} text-pink-400`} />;
+                          case "scarf": return <Wind className={`${iconClass} text-cyan-500`} />;
+                          case "cape": return <Sparkles className={`${iconClass} text-red-500`} />;
+                          case "sweater": return <Shirt className={`${iconClass} text-orange-500`} />;
+                          default: return <Sparkles className={`${iconClass} text-muted-foreground`} />;
+                        }
+                      };
+                      return (
+                        <div
+                          key={item.id}
+                          className={`p-3 rounded-xl border-2 transition-all ${
+                            item.equipped
+                              ? "border-purple-500 bg-purple-50 dark:bg-purple-900/20"
+                              : "border-border bg-muted/30"
+                          }`}
+                        >
+                          <div className="flex justify-center mb-2"><ItemIcon id={item.itemId} /></div>
+                          <p className="text-xs font-medium text-center mb-2 truncate">
+                            {itemNames[item.itemId] || item.itemId}
+                          </p>
+                          <Button
+                            size="sm"
+                            variant={item.equipped ? "outline" : "default"}
+                            className="w-full text-xs"
+                            onClick={() =>
+                              item.equipped
+                                ? unequipMutation.mutate(item.itemId)
+                                : equipMutation.mutate(item.itemId)
+                            }
+                            disabled={equipMutation.isPending || unequipMutation.isPending}
+                            data-testid={`button-toggle-${item.itemId}`}
+                          >
+                            {item.equipped ? (t.shop?.unequip || "Remove") : (t.shop?.equip || "Wear")}
+                          </Button>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </motion.div>
+            </motion.div>
           )}
         </AnimatePresence>
 
