@@ -251,16 +251,24 @@ export async function registerRoutes(
     const xpGain = 10;
     let newExp = pet.experience + xpGain;
     let newLevel = pet.level;
+    let leveledUp = false;
     const levelThreshold = 100 + (pet.level - 1) * 25;
 
     if (newExp >= levelThreshold) {
       newLevel += 1;
       newExp = newExp - levelThreshold;
+      leveledUp = true;
     }
 
     // Check if blood sugar is in a bad range
     const isBloodSugarBad = pet.bloodSugar < 70 || pet.bloodSugar > 180;
-    const coinChange = isBloodSugarBad ? -1 : 1;
+    let coinChange = isBloodSugarBad ? -1 : 1;
+    
+    // Level up bonus: +20 coins per level gained
+    if (leveledUp) {
+      coinChange += 20;
+    }
+    
     const newCoins = Math.max(0, (pet.coins || 0) + coinChange);
 
     updates.experience = newExp;
@@ -274,6 +282,8 @@ export async function registerRoutes(
       cooldown: false,
       coinsEarned: coinChange,
       isBloodSugarBad,
+      leveledUp,
+      newLevel: leveledUp ? newLevel : undefined,
       pet: updatedPet 
     });
   });
@@ -316,7 +326,14 @@ export async function registerRoutes(
 
       updates.experience = newExp;
       updates.level = newLevel;
-      updates.coins = (pet.coins || 0) + 5; // Bonus coins for challenge completion
+      
+      // Challenge completion bonus: +5 coins
+      // Level up bonus: +20 coins per level gained
+      let coinBonus = 5;
+      if (leveledUp) {
+        coinBonus += 20;
+      }
+      updates.coins = (pet.coins || 0) + coinBonus;
       updates.activeScenario = null;
       updates.scenarioDescription = null;
     }
