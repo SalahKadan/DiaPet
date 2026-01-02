@@ -140,10 +140,8 @@ function SafetyRoutineGame({ onBack, petId }: { onBack: () => void; petId: numbe
   const [hearts, setHearts] = useState(5);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [score, setScore] = useState(0);
-  const [coinsEarned, setCoinsEarned] = useState(0);
   const [gameState, setGameState] = useState<'playing' | 'correct' | 'wrong' | 'gameover' | 'victory'>('playing');
   const [shuffledScenarios] = useState(() => [...scenarios].sort(() => Math.random() - 0.5).slice(0, 8));
-  const [showReward, setShowReward] = useState(false);
   const coinsAddedRef = useRef(false);
 
   const addCoinsMutation = useMutation({
@@ -195,11 +193,7 @@ function SafetyRoutineGame({ onBack, petId }: { onBack: () => void; petId: numbe
     
     if (isCorrect) {
       setScore(score + 1);
-      const earnedCoins = 5;
-      setCoinsEarned(coinsEarned + earnedCoins);
       setGameState('correct');
-      setShowReward(true);
-      setTimeout(() => setShowReward(false), 1000);
     } else {
       const newHearts = hearts - 1;
       setHearts(newHearts);
@@ -221,17 +215,16 @@ function SafetyRoutineGame({ onBack, petId }: { onBack: () => void; petId: numbe
   };
 
   useEffect(() => {
-    if ((gameState === 'gameover' || gameState === 'victory') && coinsEarned > 0 && !coinsAddedRef.current) {
+    if (gameState === 'victory' && !coinsAddedRef.current) {
       coinsAddedRef.current = true;
-      addCoinsMutation.mutate(coinsEarned);
+      addCoinsMutation.mutate(5);
     }
-  }, [gameState, coinsEarned, addCoinsMutation]);
+  }, [gameState, addCoinsMutation]);
 
   const resetGame = () => {
     setHearts(5);
     setCurrentIndex(0);
     setScore(0);
-    setCoinsEarned(0);
     setGameState('playing');
     coinsAddedRef.current = false;
   };
@@ -249,14 +242,8 @@ function SafetyRoutineGame({ onBack, petId }: { onBack: () => void; petId: numbe
         </motion.div>
         <h2 className="text-3xl font-bold text-red-500 mb-2">{t.games.gameOver}</h2>
         <p className="text-muted-foreground mb-2">{t.games.ranOutHearts}</p>
-        <p className="text-lg font-semibold mb-2">{t.games.score}: {score}/{shuffledScenarios.length}</p>
-        {coinsEarned > 0 && (
-          <div className="flex items-center gap-2 mb-4 text-yellow-500">
-            <Coins className="w-5 h-5" />
-            <span className="font-bold">+{coinsEarned}</span>
-          </div>
-        )}
-        <div className="flex gap-3 mt-4">
+        <p className="text-lg font-semibold mb-4">{t.games.score}: {score}/{shuffledScenarios.length}</p>
+        <div className="flex gap-3">
           <Button onClick={resetGame} className="rounded-xl">
             <Star className={`w-5 h-5 ${isRTL ? 'ml-2' : 'mr-2'}`} />
             {t.games.tryAgain}
@@ -285,7 +272,7 @@ function SafetyRoutineGame({ onBack, petId }: { onBack: () => void; petId: numbe
         <p className="text-lg font-semibold mb-2">{t.games.score}: {score}/{shuffledScenarios.length}</p>
         <div className="flex items-center gap-2 mb-4 text-yellow-500">
           <Coins className="w-6 h-6" />
-          <span className="font-bold text-xl">+{coinsEarned}</span>
+          <span className="font-bold text-xl">+5</span>
         </div>
         <div className="flex items-center gap-1 mb-6">
           {Array.from({ length: hearts }).map((_, i) => (
@@ -324,7 +311,7 @@ function SafetyRoutineGame({ onBack, petId }: { onBack: () => void; petId: numbe
         </div>
         <div className="flex items-center gap-2 bg-yellow-500/20 px-3 py-1 rounded-full">
           <Coins className="w-4 h-4 text-yellow-500" />
-          <span className="font-bold text-sm text-yellow-600">{coinsEarned}</span>
+          <span className="font-bold text-sm text-yellow-600">5</span>
         </div>
       </div>
 
@@ -332,20 +319,6 @@ function SafetyRoutineGame({ onBack, petId }: { onBack: () => void; petId: numbe
         <div className="text-xs text-muted-foreground mb-2">
           {t.games.question} {currentIndex + 1} {t.games.of} {shuffledScenarios.length}
         </div>
-
-        <AnimatePresence mode="wait">
-          {showReward && (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              className="absolute top-20 flex items-center gap-2 bg-yellow-500 text-white px-4 py-2 rounded-full shadow-lg z-20"
-            >
-              <Coins className="w-5 h-5" />
-              <span className="font-bold">+5</span>
-            </motion.div>
-          )}
-        </AnimatePresence>
 
         <AnimatePresence mode="wait">
           {gameState === 'correct' && (
