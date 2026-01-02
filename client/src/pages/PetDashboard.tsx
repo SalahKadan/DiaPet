@@ -564,7 +564,7 @@ export function PetDashboard({ pet }: PetDashboardProps) {
                 </div>
               )}
             </div>
-            <div className="flex flex-col gap-1">
+            <div className="flex flex-row gap-1">
               <Button 
                 variant="ghost" 
                 size="icon" 
