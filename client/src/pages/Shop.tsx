@@ -44,12 +44,13 @@ export function Shop({ pet, onClose }: ShopProps) {
   });
 
   const purchaseMutation = useMutation({
-    mutationFn: async ({ itemId, price }: { itemId: string; price: number }) => {
-      const res = await apiRequest("POST", `/api/pets/${pet.id}/purchase`, { itemId, price });
+    mutationFn: async (itemId: string) => {
+      const res = await apiRequest("POST", `/api/pets/${pet.id}/purchase`, { itemId });
       return res.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/pets", pet.id, "owned-items"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/pets", pet.id, "equipped-items"] });
       queryClient.invalidateQueries({ queryKey: ["/api/pets"] });
       toast({
         title: t.shop.purchaseSuccess,
@@ -176,7 +177,7 @@ export function Shop({ pet, onClose }: ShopProps) {
                 size="sm"
                 className="w-full"
                 disabled={!canAfford || purchaseMutation.isPending}
-                onClick={() => purchaseMutation.mutate({ itemId: item.itemId, price: item.price })}
+                onClick={() => purchaseMutation.mutate(item.itemId)}
                 data-testid={`button-buy-${item.itemId}`}
               >
                 {t.shop.buy}

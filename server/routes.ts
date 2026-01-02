@@ -547,13 +547,23 @@ export async function registerRoutes(
   app.post("/api/pets/:id/purchase", async (req, res) => {
     try {
       const petId = Number(req.params.id);
-      const { itemId, price } = req.body;
+      const { itemId } = req.body;
 
       const pet = await storage.getPet(petId);
       if (!pet) {
         res.status(404).json({ message: "Pet not found" });
         return;
       }
+
+      // Look up item price server-side (don't trust client)
+      const shopItems = await storage.getShopItems();
+      const shopItem = shopItems.find(item => item.itemId === itemId);
+      if (!shopItem) {
+        res.status(404).json({ message: "Item not found in shop" });
+        return;
+      }
+
+      const price = shopItem.price;
 
       if (pet.coins < price) {
         res.status(400).json({ message: "Not enough coins" });

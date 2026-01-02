@@ -12,9 +12,14 @@ import { Input } from "@/components/ui/input";
 import { Heart, Zap, Utensils, Moon, Sun, MessageCircle, Activity, BarChart3, Gamepad2, Syringe, Coins, Clock, Settings, ShoppingCart, Monitor } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useLanguage } from "@/contexts/LanguageContext";
+
+interface EquippedItem {
+  itemId: string;
+  equipped: boolean;
+}
 
 interface PetDashboardProps {
   pet: Pet;
@@ -47,6 +52,16 @@ export function PetDashboard({ pet }: PetDashboardProps) {
   const [shopOpen, setShopOpen] = useState(false);
   const lastScenarioRef = useRef<string | null>(null);
   const challengeIntervalRef = useRef<NodeJS.Timeout | null>(null);
+
+  const { data: equippedItems = [] } = useQuery<EquippedItem[]>({
+    queryKey: ["/api/pets", pet.id, "equipped-items"],
+    queryFn: async () => {
+      const res = await fetch(`/api/pets/${pet.id}/equipped-items`);
+      if (!res.ok) throw new Error("Failed to fetch equipped items");
+      return res.json();
+    },
+    refetchInterval: 10000,
+  });
 
   useEffect(() => {
     if (pet.lastBloodTest) {
@@ -556,7 +571,7 @@ export function PetDashboard({ pet }: PetDashboardProps) {
                   </motion.div>
                 )}
               </AnimatePresence>
-              <PetAvatar pet={pet} className="w-full max-w-[280px] mx-auto drop-shadow-[0_0_50px_rgba(59,130,246,0.3)]" />
+              <PetAvatar pet={pet} equippedItems={equippedItems} className="w-full max-w-[280px] mx-auto drop-shadow-[0_0_50px_rgba(59,130,246,0.3)]" />
             </motion.div>
           </div>
           
