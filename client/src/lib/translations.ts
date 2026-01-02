@@ -76,6 +76,7 @@ export const translations = {
       sleep: "Sleep",
       wake: "Wake",
       play: "Play",
+      loading: "Loading...",
     },
     status: {
       sleeping: "is sleeping...",
@@ -294,6 +295,7 @@ export const translations = {
       sleep: "نوم",
       wake: "استيقظ",
       play: "العب",
+      loading: "جاري التحميل...",
     },
     status: {
       sleeping: "نائم...",
@@ -512,6 +514,7 @@ export const translations = {
       sleep: "שינה",
       wake: "התעורר",
       play: "שחק",
+      loading: "טוען...",
     },
     status: {
       sleeping: "ישן...",
