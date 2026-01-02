@@ -7,7 +7,7 @@ import { InsulinControl } from "@/components/InsulinControl";
 import { GamesMenu } from "@/components/GamesMenu";
 import { Shop } from "@/pages/Shop";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTrigger, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Heart, Zap, Utensils, Moon, Sun, MessageCircle, Activity, BarChart3, Gamepad2, Syringe, Coins, Clock, Settings, ShoppingCart, Monitor, Shirt, Ribbon, Crown, Glasses, PartyPopper, Circle, Wind, Sparkles, X } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
@@ -670,7 +670,7 @@ export function PetDashboard({ pet }: PetDashboardProps) {
                 </Button>
               </DialogTrigger>
               <DialogContent className="max-w-[350px] rounded-3xl bg-card/95 backdrop-blur-xl border-white/10">
-                <h2 className="text-xl font-display text-center mb-4">{t.dashboard.pickSnack}</h2>
+                <DialogTitle className="text-xl font-display text-center mb-4">{t.dashboard.pickSnack}</DialogTitle>
                 <FoodSelector onSelect={(foodId) => handleAction('feed', { foodId })} disabled={handleActionMutation.isPending} />
               </DialogContent>
             </Dialog>
@@ -681,7 +681,7 @@ export function PetDashboard({ pet }: PetDashboardProps) {
                 </Button>
               </DialogTrigger>
               <DialogContent className="max-w-[350px] rounded-3xl bg-card/95 backdrop-blur-xl border-white/10">
-                <h2 className="text-xl font-display text-center mb-4">{t.dashboard.insulinPump}</h2>
+                <DialogTitle className="text-xl font-display text-center mb-4">{t.dashboard.insulinPump}</DialogTitle>
                 <InsulinControl currentBloodSugar={pet.bloodSugar} isPending={handleActionMutation.isPending} onAdminister={(units) => handleAction('insulin', { insulinUnits: units })} />
               </DialogContent>
             </Dialog>

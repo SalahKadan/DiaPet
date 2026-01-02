@@ -68,6 +68,8 @@ export const translations = {
       waitSeconds: "Please wait before testing again.",
       pickSnack: "Pick a Snack!",
       insulinPump: "Insulin Pump",
+      carbs: "Carbs",
+      healthPts: "Health",
     },
     actions: {
       feed: "Feed",
@@ -284,6 +286,8 @@ export const translations = {
       waitSeconds: "الرجاء الانتظار قبل الاختبار مرة أخرى.",
       pickSnack: "اختر وجبة خفيفة!",
       insulinPump: "مضخة الأنسولين",
+      carbs: "كربوهيدرات",
+      healthPts: "صحة",
     },
     actions: {
       feed: "أطعم",
@@ -500,6 +504,8 @@ export const translations = {
       waitSeconds: "אנא המתן לפני הבדיקה הבאה.",
       pickSnack: "בחר חטיף!",
       insulinPump: "משאבת אינסולין",
+      carbs: "פחמימות",
+      healthPts: "בריאות",
     },
     actions: {
       feed: "האכל",
