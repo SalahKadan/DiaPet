@@ -75,7 +75,7 @@ export function PetDashboard({ pet }: PetDashboardProps) {
       if (!pet.isAsleep) {
         handleActionMutation.mutate({ id: pet.id, type: 'play' });
       }
-    }, 120000);
+    }, 30000);
     return () => {
       if (challengeIntervalRef.current) {
         clearInterval(challengeIntervalRef.current);
