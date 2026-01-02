@@ -9,7 +9,7 @@ import { Shop } from "@/pages/Shop";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTrigger, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { Heart, Zap, Utensils, Moon, Sun, MessageCircle, Activity, BarChart3, Gamepad2, Syringe, Coins, Clock, Settings, ShoppingCart, Monitor, Shirt, Ribbon, Crown, Glasses, PartyPopper, Circle, Wind, Sparkles, X } from "lucide-react";
+import { Heart, Zap, Utensils, Moon, Sun, MessageCircle, Activity, BarChart3, Gamepad2, Syringe, Coins, Clock, Settings, ShoppingCart, Monitor, Shirt, Ribbon, Crown, Glasses, PartyPopper, Circle, Wind, Sparkles, X, Check, Loader2 } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useMutation, useQuery } from "@tanstack/react-query";
@@ -71,13 +71,14 @@ export function PetDashboard({ pet }: PetDashboardProps) {
     equipped: boolean;
   }
 
-  const { data: ownedItems = [] } = useQuery<OwnedItem[]>({
+  const { data: ownedItems = [], isLoading: ownedItemsLoading } = useQuery<OwnedItem[]>({
     queryKey: ["/api/pets", pet.id, "owned-items"],
     queryFn: async () => {
       const res = await fetch(`/api/pets/${pet.id}/owned-items`);
       if (!res.ok) throw new Error("Failed to fetch owned items");
       return res.json();
     },
+    refetchInterval: 5000,
   });
 
   const equipMutation = useMutation({
@@ -770,7 +771,16 @@ export function PetDashboard({ pet }: PetDashboardProps) {
                   </Button>
                 </div>
                 
-                {ownedItems.length === 0 ? (
+                {ownedItemsLoading ? (
+                  <div className="text-center py-8 text-muted-foreground">
+                    <motion.div
+                      animate={{ rotate: 360 }}
+                      transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                      className="w-12 h-12 mx-auto mb-3 border-4 border-purple-500/30 border-t-purple-500 rounded-full"
+                    />
+                    <p className="text-sm">{t.actions?.loading || "Loading..."}</p>
+                  </div>
+                ) : ownedItems.length === 0 ? (
                   <div className="text-center py-8 text-muted-foreground">
                     <Shirt className="w-12 h-12 mx-auto mb-3 opacity-30" />
                     <p>{t.shop?.noItems || "No items yet!"}</p>
@@ -819,7 +829,7 @@ export function PetDashboard({ pet }: PetDashboardProps) {
                           <Button
                             size="sm"
                             variant={item.equipped ? "outline" : "default"}
-                            className="w-full text-xs"
+                            className={`w-full text-xs ${item.equipped ? "border-purple-500 text-purple-600 dark:text-purple-400" : ""}`}
                             onClick={() =>
                               item.equipped
                                 ? unequipMutation.mutate(item.itemId)
@@ -828,7 +838,13 @@ export function PetDashboard({ pet }: PetDashboardProps) {
                             disabled={equipMutation.isPending || unequipMutation.isPending}
                             data-testid={`button-toggle-${item.itemId}`}
                           >
-                            {item.equipped ? (t.shop?.unequip || "Remove") : (t.shop?.equip || "Wear")}
+                            {equipMutation.isPending || unequipMutation.isPending ? (
+                              <Loader2 className="w-3 h-3 animate-spin" />
+                            ) : item.equipped ? (
+                              <><Check className="w-3 h-3 mr-1" />{t.shop?.unequip || "Remove"}</>
+                            ) : (
+                              t.shop?.equip || "Wear"
+                            )}
                           </Button>
                         </div>
                       );
