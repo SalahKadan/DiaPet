@@ -448,9 +448,9 @@ function TreeClimbGame({ onBack, petId }: { onBack: () => void; petId: number })
   const petControls = useAnimationControls();
   const maxLevel = levels.length;
   
-  const LOG_SPACING = 120;
-  const VIEWPORT_HEIGHT = 400;
-  const PET_BASELINE = 90;
+  const LOG_SPACING = 160;
+  const VIEWPORT_HEIGHT = 420;
+  const PET_BASELINE = 70;
 
   const addCoinsMutation = useMutation({
     mutationFn: async (amount: number) => {
@@ -704,7 +704,7 @@ function TreeClimbGame({ onBack, petId }: { onBack: () => void; petId: number })
         </motion.div>
 
         <motion.div
-          className="absolute left-1/2 -translate-x-1/2 w-16"
+          className="absolute left-1/2 -translate-x-1/2 w-28"
           style={{ 
             height: worldHeight,
             bottom: -worldHeight + VIEWPORT_HEIGHT,
@@ -716,14 +716,14 @@ function TreeClimbGame({ onBack, petId }: { onBack: () => void; petId: number })
             className="absolute inset-0"
             style={{ 
               background: 'linear-gradient(to top, #5d3a1a, #7a4a2a 20%, #6b4423 50%, #5d3a1a 80%, #4a2e15)',
-              borderRadius: '6px 6px 0 0'
+              borderRadius: '8px 8px 0 0'
             }}
           >
-            {[...Array(Math.ceil(worldHeight / 40))].map((_, i) => (
+            {[...Array(Math.ceil(worldHeight / 50))].map((_, i) => (
               <div 
                 key={i}
-                className="absolute left-0 right-0 h-0.5 bg-amber-900/30"
-                style={{ bottom: `${i * 40}px` }}
+                className="absolute left-0 right-0 h-1 bg-amber-900/30"
+                style={{ bottom: `${i * 50}px` }}
               />
             ))}
           </div>
@@ -743,7 +743,7 @@ function TreeClimbGame({ onBack, petId }: { onBack: () => void; petId: number })
               >
                 {logOptions.map((option, optIndex) => {
                   const Icon = actionIcons[option.action];
-                  const offsetX = (optIndex - 1) * 90;
+                  const offsetX = (optIndex - 1) * 115;
                   const isSelected = selectedLogIndex === optIndex;
                   
                   return (
@@ -769,7 +769,7 @@ function TreeClimbGame({ onBack, petId }: { onBack: () => void; petId: number })
                       }}
                     >
                       <motion.button
-                        className={`relative flex flex-col items-center justify-center w-24 h-16 rounded-lg shadow-lg border-2 ${
+                        className={`relative flex flex-col items-center justify-center w-28 h-20 rounded-xl shadow-xl border-3 ${
                           isSelected
                           ? 'bg-gradient-to-b from-green-500 to-green-700 border-green-400'
                           : 'bg-gradient-to-b from-amber-500 to-amber-700 border-amber-400'
@@ -791,14 +791,14 @@ function TreeClimbGame({ onBack, petId }: { onBack: () => void; petId: number })
                             delay: optIndex * 0.25
                           }}
                         >
-                          <Icon className="w-6 h-6 text-white drop-shadow-lg" />
+                          <Icon className="w-8 h-8 text-white drop-shadow-lg" />
                         </motion.div>
-                        <span className="text-[9px] font-bold text-white mt-1 drop-shadow-md text-center leading-tight px-1">
+                        <span className="text-[10px] font-bold text-white mt-1.5 drop-shadow-md text-center leading-tight px-1">
                           {actionLabels[option.action]}
                         </span>
                         
-                        <div className="absolute -left-2 top-1/2 -translate-y-1/2 w-2 h-3 bg-amber-800 rounded-l-sm" />
-                        <div className="absolute -right-2 top-1/2 -translate-y-1/2 w-2 h-3 bg-amber-800 rounded-r-sm" />
+                        <div className="absolute -left-3 top-1/2 -translate-y-1/2 w-3 h-4 bg-amber-800 rounded-l-sm" />
+                        <div className="absolute -right-3 top-1/2 -translate-y-1/2 w-3 h-4 bg-amber-800 rounded-r-sm" />
                       </motion.button>
                     </motion.div>
                   );
@@ -847,14 +847,15 @@ function TreeClimbGame({ onBack, petId }: { onBack: () => void; petId: number })
               className="relative"
             >
               <motion.div 
-                className="w-14 h-14 rounded-full bg-white shadow-2xl flex items-center justify-center border-4 border-blue-300"
+                className="w-18 h-18 rounded-full bg-white shadow-2xl flex items-center justify-center border-4 border-blue-300"
+                style={{ width: '72px', height: '72px' }}
                 animate={{
                   boxShadow: gameState === 'jumping' 
-                    ? ['0 4px 15px rgba(0,0,0,0.2)', '0 25px 50px rgba(0,0,0,0.4)', '0 8px 20px rgba(0,0,0,0.25)']
+                    ? ['0 4px 15px rgba(0,0,0,0.2)', '0 30px 60px rgba(0,0,0,0.4)', '0 10px 25px rgba(0,0,0,0.25)']
                     : '0 4px 15px rgba(0,0,0,0.2)'
                 }}
               >
-                <Cat className="w-8 h-8 text-gray-600" />
+                <Cat className="w-10 h-10 text-gray-600" />
               </motion.div>
               
               {gameState === 'jumping' && (
