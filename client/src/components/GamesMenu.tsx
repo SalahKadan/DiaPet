@@ -700,8 +700,8 @@ function TreeClimbGame({ onBack, petId }: { onBack: () => void; petId: number })
         <div className="absolute top-8 right-6 w-16 h-24 bg-gradient-to-bl from-green-600 to-green-700 rounded-bl-[60px] opacity-80" />
         
         <motion.div
-          className="absolute left-1/2 -translate-x-1/2 bottom-0"
-          style={{ width: '55%', height: '100%' }}
+          className="absolute bottom-0"
+          style={{ width: '50%', height: '100%', left: '25%' }}
           animate={{ y: worldScrollY * 0.5 }}
           transition={{ type: "spring", damping: 22, stiffness: 90, delay: 0.2 }}
         >
@@ -747,20 +747,16 @@ function TreeClimbGame({ onBack, petId }: { onBack: () => void; petId: number })
         </div>
 
         <motion.div
-          className="absolute left-1/2 -translate-x-1/2 z-20"
-          style={{ top: '22%', width: '75%' }}
+          className="absolute z-20"
+          style={{ top: '20%', left: '12%', width: '65%' }}
           animate={
             gameState === 'falling' 
               ? { y: [0, -30, 400], rotate: [0, -20, 360] }
-              : gameState === 'jumping'
-              ? { y: [-20, -60, -20] }
-              : { y: [0, -8, 0] }
+              : { y: [0, -6, 0] }
           }
           transition={
             gameState === 'falling'
               ? { duration: 1.4, ease: [0.4, 0, 1, 1] }
-              : gameState === 'jumping'
-              ? { duration: 0.5, ease: "easeOut" }
               : { repeat: Infinity, duration: 2 }
           }
         >
@@ -773,25 +769,40 @@ function TreeClimbGame({ onBack, petId }: { onBack: () => void; petId: number })
           
           <motion.div 
             className="absolute -top-16 left-1/2 -translate-x-1/2"
-            animate={petControls}
+            animate={
+              gameState === 'jumping'
+                ? { y: [0, -80, -80, 0], scale: [1, 1.15, 1.15, 1] }
+                : { y: 0, scale: 1 }
+            }
+            transition={
+              gameState === 'jumping'
+                ? { duration: 0.7, times: [0, 0.3, 0.6, 1], ease: "easeOut" }
+                : { duration: 0.3 }
+            }
           >
             <motion.div 
               className="w-20 h-20 rounded-full bg-gradient-to-b from-white to-gray-100 shadow-2xl flex items-center justify-center border-4 border-orange-300"
-              animate={{
-                scale: gameState === 'jumping' ? [1, 1.1, 1] : 1,
-              }}
             >
               <Cat className="w-12 h-12 text-orange-400" />
             </motion.div>
             {gameState === 'jumping' && (
-              <motion.div
-                className="absolute -top-4 left-1/2 -translate-x-1/2 flex gap-1"
-                initial={{ opacity: 1, y: 0 }}
-                animate={{ opacity: 0, y: -20 }}
-              >
-                <Sparkles className="w-4 h-4 text-yellow-400" />
-                <Sparkles className="w-4 h-4 text-yellow-400" />
-              </motion.div>
+              <>
+                <motion.div
+                  className="absolute -top-4 left-1/2 -translate-x-1/2 flex gap-1"
+                  initial={{ opacity: 1, y: 0 }}
+                  animate={{ opacity: 0, y: -30 }}
+                  transition={{ duration: 0.5 }}
+                >
+                  <Sparkles className="w-5 h-5 text-yellow-400" />
+                  <Sparkles className="w-5 h-5 text-yellow-400" />
+                </motion.div>
+                <motion.div
+                  className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-12 h-3 bg-black/20 rounded-full blur-sm"
+                  initial={{ scale: 1, opacity: 0.5 }}
+                  animate={{ scale: 0.3, opacity: 0 }}
+                  transition={{ duration: 0.4 }}
+                />
+              </>
             )}
             {gameState === 'falling' && (
               <motion.div
@@ -809,8 +820,8 @@ function TreeClimbGame({ onBack, petId }: { onBack: () => void; petId: number })
           {gameState !== 'jumping' && (
             <motion.div 
               key={currentLevel}
-              className="absolute left-1/2 -translate-x-1/2 z-10"
-              style={{ top: '52%', width: '90%' }}
+              className="absolute z-10"
+              style={{ top: '52%', left: '5%', width: '90%' }}
               initial={{ opacity: 0, y: -40 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: 80 }}
