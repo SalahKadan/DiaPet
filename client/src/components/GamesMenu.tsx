@@ -748,72 +748,55 @@ function TreeClimbGame({ onBack, petId }: { onBack: () => void; petId: number })
 
         <motion.div
           className="absolute z-20"
-          style={{ top: '20%', left: '12%', width: '65%' }}
+          style={{ bottom: '80px', left: '50%', transform: 'translateX(-50%)' }}
           animate={
             gameState === 'falling' 
               ? { y: [0, -30, 400], rotate: [0, -20, 360] }
-              : { y: [0, -6, 0] }
+              : gameState === 'jumping'
+              ? { y: [0, -120, -120, 0], scale: [1, 1.15, 1.15, 1] }
+              : { y: [0, -8, 0] }
           }
           transition={
             gameState === 'falling'
               ? { duration: 1.4, ease: [0.4, 0, 1, 1] }
+              : gameState === 'jumping'
+              ? { duration: 0.7, times: [0, 0.3, 0.6, 1], ease: "easeOut" }
               : { repeat: Infinity, duration: 2 }
           }
         >
-          <div className="relative h-10 bg-gradient-to-r from-amber-800 via-amber-600 to-amber-800 rounded-lg shadow-xl" style={{ boxShadow: '0 6px 12px rgba(0,0,0,0.4)' }}>
-            <div className="absolute inset-0 bg-gradient-to-b from-white/20 to-transparent rounded-lg" />
-            <div className="absolute left-2 right-2 top-1/2 -translate-y-1/2 h-1 bg-amber-900/30 rounded-full" />
-            <div className="absolute -left-3 top-1/2 -translate-y-1/2 w-4 h-6 bg-amber-700 rounded-l-lg" />
-            <div className="absolute -right-3 top-1/2 -translate-y-1/2 w-4 h-6 bg-amber-700 rounded-r-lg" />
-          </div>
-          
           <motion.div 
-            className="absolute -top-16 left-1/2 -translate-x-1/2"
-            animate={
-              gameState === 'jumping'
-                ? { y: [0, -80, -80, 0], scale: [1, 1.15, 1.15, 1] }
-                : { y: 0, scale: 1 }
-            }
-            transition={
-              gameState === 'jumping'
-                ? { duration: 0.7, times: [0, 0.3, 0.6, 1], ease: "easeOut" }
-                : { duration: 0.3 }
-            }
+            className="w-20 h-20 rounded-full bg-gradient-to-b from-white to-gray-100 shadow-2xl flex items-center justify-center border-4 border-orange-300"
           >
-            <motion.div 
-              className="w-20 h-20 rounded-full bg-gradient-to-b from-white to-gray-100 shadow-2xl flex items-center justify-center border-4 border-orange-300"
-            >
-              <Cat className="w-12 h-12 text-orange-400" />
-            </motion.div>
-            {gameState === 'jumping' && (
-              <>
-                <motion.div
-                  className="absolute -top-4 left-1/2 -translate-x-1/2 flex gap-1"
-                  initial={{ opacity: 1, y: 0 }}
-                  animate={{ opacity: 0, y: -30 }}
-                  transition={{ duration: 0.5 }}
-                >
-                  <Sparkles className="w-5 h-5 text-yellow-400" />
-                  <Sparkles className="w-5 h-5 text-yellow-400" />
-                </motion.div>
-                <motion.div
-                  className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-12 h-3 bg-black/20 rounded-full blur-sm"
-                  initial={{ scale: 1, opacity: 0.5 }}
-                  animate={{ scale: 0.3, opacity: 0 }}
-                  transition={{ duration: 0.4 }}
-                />
-              </>
-            )}
-            {gameState === 'falling' && (
-              <motion.div
-                className="absolute -top-6 left-1/2 -translate-x-1/2"
-                initial={{ opacity: 1 }}
-                animate={{ opacity: 0, y: -20 }}
-              >
-                <XCircle className="w-8 h-8 text-red-500" />
-              </motion.div>
-            )}
+            <Cat className="w-12 h-12 text-orange-400" />
           </motion.div>
+          {gameState === 'jumping' && (
+            <>
+              <motion.div
+                className="absolute -top-4 left-1/2 -translate-x-1/2 flex gap-1"
+                initial={{ opacity: 1, y: 0 }}
+                animate={{ opacity: 0, y: -30 }}
+                transition={{ duration: 0.5 }}
+              >
+                <Sparkles className="w-5 h-5 text-yellow-400" />
+                <Sparkles className="w-5 h-5 text-yellow-400" />
+              </motion.div>
+              <motion.div
+                className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-12 h-3 bg-black/20 rounded-full blur-sm"
+                initial={{ scale: 1, opacity: 0.5 }}
+                animate={{ scale: 0.3, opacity: 0 }}
+                transition={{ duration: 0.4 }}
+              />
+            </>
+          )}
+          {gameState === 'falling' && (
+            <motion.div
+              className="absolute -top-6 left-1/2 -translate-x-1/2"
+              initial={{ opacity: 1 }}
+              animate={{ opacity: 0, y: -20 }}
+            >
+              <XCircle className="w-8 h-8 text-red-500" />
+            </motion.div>
+          )}
         </motion.div>
 
         <AnimatePresence mode="popLayout">
@@ -821,10 +804,10 @@ function TreeClimbGame({ onBack, petId }: { onBack: () => void; petId: number })
             <motion.div 
               key={currentLevel}
               className="absolute z-10"
-              style={{ top: '52%', left: '5%', width: '90%' }}
-              initial={{ opacity: 0, y: -40 }}
+              style={{ top: '28%', left: '5%', width: '90%' }}
+              initial={{ opacity: 0, y: -60 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 80 }}
+              exit={{ opacity: 0, scale: 0.8 }}
               transition={{ type: "spring", damping: 18, stiffness: 150 }}
             >
               <div className="relative h-20 bg-gradient-to-r from-amber-800 via-amber-600 to-amber-800 rounded-xl shadow-2xl" style={{ boxShadow: '0 8px 20px rgba(0,0,0,0.4)' }}>
