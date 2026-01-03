@@ -137,7 +137,7 @@ function SafetyRoutineGame({ onBack, petId }: { onBack: () => void; petId: numbe
   const { t, isRTL } = useLanguage();
   const queryClient = useQueryClient();
   const scenarios = getSafetyScenarios(t);
-  const [hearts, setHearts] = useState(5);
+  const [hearts, setHearts] = useState(3);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [score, setScore] = useState(0);
   const [gameState, setGameState] = useState<'playing' | 'correct' | 'wrong' | 'gameover' | 'victory'>('playing');
@@ -222,7 +222,7 @@ function SafetyRoutineGame({ onBack, petId }: { onBack: () => void; petId: numbe
   }, [gameState, addCoinsMutation]);
 
   const resetGame = () => {
-    setHearts(5);
+    setHearts(3);
     setCurrentIndex(0);
     setScore(0);
     setGameState('playing');
@@ -299,7 +299,7 @@ function SafetyRoutineGame({ onBack, petId }: { onBack: () => void; petId: numbe
           <X className="w-6 h-6" />
         </Button>
         <div className="flex items-center gap-1">
-          {Array.from({ length: 5 }).map((_, i) => (
+          {Array.from({ length: 3 }).map((_, i) => (
             <motion.div
               key={i}
               initial={false}
