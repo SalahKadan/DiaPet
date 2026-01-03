@@ -2,7 +2,8 @@ import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { X, Brain, Puzzle, Target, Clock, Lock, Heart, Trophy, Star, Sparkles, CheckCircle, XCircle, Shield, Home, School, Palmtree, PartyPopper, Moon, Activity, Users, Coffee, Cookie, Coins } from "lucide-react";
+import { X, Brain, Puzzle, Target, Clock, Lock, Heart, Trophy, Star, Sparkles, CheckCircle, XCircle, Shield, Home, School, Palmtree, PartyPopper, Moon, Activity, Users, Coffee, Cookie, Coins, TreePine, Droplets, Syringe, Apple, Bed, Zap } from "lucide-react";
+import { Progress } from "@/components/ui/progress";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
@@ -407,6 +408,348 @@ function SafetyRoutineGame({ onBack, petId }: { onBack: () => void; petId: numbe
   );
 }
 
+type TreeAction = 'eatFood' | 'takeInsulin' | 'rest' | 'drinkWater' | 'checkLevels';
+
+interface TreeLevel {
+  bloodSugar: 'low' | 'high' | 'normal';
+  energy: 'low' | 'normal';
+  correctAction: TreeAction;
+  distractors: TreeAction[];
+}
+
+function generateTreeLevels(): TreeLevel[] {
+  const levels: TreeLevel[] = [
+    { bloodSugar: 'low', energy: 'normal', correctAction: 'eatFood', distractors: ['takeInsulin', 'rest'] },
+    { bloodSugar: 'high', energy: 'normal', correctAction: 'takeInsulin', distractors: ['eatFood', 'rest'] },
+    { bloodSugar: 'normal', energy: 'low', correctAction: 'rest', distractors: ['takeInsulin', 'eatFood'] },
+    { bloodSugar: 'low', energy: 'low', correctAction: 'eatFood', distractors: ['takeInsulin', 'drinkWater'] },
+    { bloodSugar: 'high', energy: 'low', correctAction: 'takeInsulin', distractors: ['eatFood', 'rest'] },
+    { bloodSugar: 'normal', energy: 'normal', correctAction: 'checkLevels', distractors: ['takeInsulin', 'eatFood'] },
+  ];
+  return levels;
+}
+
+function TreeClimbGame({ onBack, petId }: { onBack: () => void; petId: number }) {
+  const { t, isRTL } = useLanguage();
+  const queryClient = useQueryClient();
+  const [currentLevel, setCurrentLevel] = useState(0);
+  const [petPosition, setPetPosition] = useState(0);
+  const [gameState, setGameState] = useState<'playing' | 'jumping' | 'falling' | 'victory' | 'gameover'>('playing');
+  const [levels, setLevels] = useState(() => generateTreeLevels());
+  const coinsAddedRef = useRef(false);
+  const maxLevel = levels.length;
+
+  const addCoinsMutation = useMutation({
+    mutationFn: async (amount: number) => {
+      await apiRequest('POST', `/api/pets/${petId}/add-coins`, { amount });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/pets'] });
+    }
+  });
+
+  useEffect(() => {
+    if (gameState === 'victory' && !coinsAddedRef.current) {
+      coinsAddedRef.current = true;
+      addCoinsMutation.mutate(10);
+    }
+  }, [gameState, addCoinsMutation]);
+
+  const currentLevelData = levels[currentLevel];
+
+  const actionIcons: Record<TreeAction, typeof Apple> = {
+    eatFood: Apple,
+    takeInsulin: Syringe,
+    rest: Bed,
+    drinkWater: Droplets,
+    checkLevels: Activity,
+  };
+
+  const actionLabels: Record<TreeAction, string> = {
+    eatFood: t.games.eatFood,
+    takeInsulin: t.games.takeInsulin,
+    rest: t.games.rest,
+    drinkWater: t.games.drinkWater,
+    checkLevels: t.games.checkLevels,
+  };
+
+  const [logOptions, setLogOptions] = useState<{ action: TreeAction; isCorrect: boolean }[]>([]);
+
+  useEffect(() => {
+    const levelData = levels[currentLevel];
+    if (levelData) {
+      const options: { action: TreeAction; isCorrect: boolean }[] = [
+        { action: levelData.correctAction, isCorrect: true },
+        ...levelData.distractors.map(d => ({ action: d, isCorrect: false }))
+      ];
+      setLogOptions(options.sort(() => Math.random() - 0.5));
+    }
+  }, [currentLevel, levels]);
+
+  const handleLogClick = (isCorrect: boolean) => {
+    if (gameState !== 'playing') return;
+
+    if (isCorrect) {
+      setGameState('jumping');
+      setPetPosition(prev => prev + 1);
+      
+      setTimeout(() => {
+        if (currentLevel + 1 >= maxLevel) {
+          setGameState('victory');
+        } else {
+          setCurrentLevel(prev => prev + 1);
+          setGameState('playing');
+        }
+      }, 800);
+    } else {
+      setGameState('falling');
+      setTimeout(() => {
+        setGameState('gameover');
+      }, 1200);
+    }
+  };
+
+  const resetGame = () => {
+    setCurrentLevel(0);
+    setPetPosition(0);
+    setGameState('playing');
+    setLevels(generateTreeLevels());
+    coinsAddedRef.current = false;
+  };
+
+  const getBloodSugarValue = () => {
+    if (!currentLevelData) return 50;
+    switch (currentLevelData.bloodSugar) {
+      case 'low': return 25;
+      case 'high': return 85;
+      default: return 50;
+    }
+  };
+
+  const getEnergyValue = () => {
+    if (!currentLevelData) return 70;
+    return currentLevelData.energy === 'low' ? 20 : 70;
+  };
+
+  const getStatusLabel = () => {
+    if (!currentLevelData) return t.games.normalLevels;
+    if (currentLevelData.bloodSugar === 'low') return t.games.lowSugar;
+    if (currentLevelData.bloodSugar === 'high') return t.games.highSugar;
+    if (currentLevelData.energy === 'low') return t.games.lowEnergy;
+    return t.games.normalLevels;
+  };
+
+  if (gameState === 'gameover') {
+    return (
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        className="flex flex-col items-center justify-center h-full p-6 text-center"
+        dir={isRTL ? 'rtl' : 'ltr'}
+      >
+        <motion.div
+          initial={{ scale: 0, rotate: -180 }}
+          animate={{ scale: 1, rotate: 0 }}
+          transition={{ type: "spring", damping: 10 }}
+        >
+          <XCircle className="w-24 h-24 text-red-500 mb-4" />
+        </motion.div>
+        <h2 className="text-3xl font-bold text-red-500 mb-2">{t.games.youFell}</h2>
+        <p className="text-muted-foreground mb-2">{t.games.level}: {currentLevel + 1}/{maxLevel}</p>
+        <div className="flex gap-3 mt-4">
+          <Button onClick={resetGame} className="rounded-xl">
+            <Star className={`w-5 h-5 ${isRTL ? 'ml-2' : 'mr-2'}`} />
+            {t.games.tryAgain}
+          </Button>
+          <Button variant="outline" onClick={onBack} className="rounded-xl">
+            {t.games.backToGames}
+          </Button>
+        </div>
+      </motion.div>
+    );
+  }
+
+  if (gameState === 'victory') {
+    return (
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        className="flex flex-col items-center justify-center h-full p-6 text-center"
+        dir={isRTL ? 'rtl' : 'ltr'}
+      >
+        <motion.div
+          initial={{ scale: 0 }}
+          animate={{ scale: [0, 1.2, 1] }}
+          transition={{ duration: 0.5 }}
+        >
+          <Trophy className="w-24 h-24 text-yellow-500 mb-4" />
+        </motion.div>
+        <h2 className="text-3xl font-bold text-yellow-500 mb-2">{t.games.reachedTop}</h2>
+        <p className="text-muted-foreground mb-2">{t.games.amazingJob}</p>
+        <div className="flex items-center gap-2 mb-4 text-yellow-500">
+          <Coins className="w-6 h-6" />
+          <span className="font-bold text-xl">+10</span>
+        </div>
+        <div className="flex gap-3">
+          <Button onClick={resetGame} className="rounded-xl">
+            <Star className={`w-5 h-5 ${isRTL ? 'ml-2' : 'mr-2'}`} />
+            {t.games.playAgain}
+          </Button>
+          <Button variant="outline" onClick={onBack} className="rounded-xl">
+            {t.games.backToGames}
+          </Button>
+        </div>
+      </motion.div>
+    );
+  }
+
+  return (
+    <div className="flex flex-col h-full" dir={isRTL ? 'rtl' : 'ltr'}>
+      <div className="flex items-center justify-between p-4 border-b border-white/10">
+        <Button variant="ghost" size="icon" onClick={onBack}>
+          <X className="w-6 h-6" />
+        </Button>
+        <div className="text-center">
+          <span className="text-sm font-medium">{t.games.level} {currentLevel + 1}/{maxLevel}</span>
+        </div>
+        <div className="flex items-center gap-2 bg-yellow-500/20 px-3 py-1 rounded-full">
+          <Coins className="w-4 h-4 text-yellow-500" />
+          <span className="font-bold text-sm text-yellow-600">10</span>
+        </div>
+      </div>
+
+      <div className="p-4 space-y-3 bg-gradient-to-b from-background to-emerald-500/5">
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 w-24">
+            <Droplets className="w-4 h-4 text-blue-500" />
+            <span className="text-xs">{t.games.bloodSugar}</span>
+          </div>
+          <Progress 
+            value={getBloodSugarValue()} 
+            className="flex-1 h-3"
+          />
+          <span className={`text-xs font-medium w-12 text-center ${
+            currentLevelData?.bloodSugar === 'low' ? 'text-orange-500' : 
+            currentLevelData?.bloodSugar === 'high' ? 'text-red-500' : 'text-green-500'
+          }`}>
+            {currentLevelData?.bloodSugar === 'low' ? '65' : currentLevelData?.bloodSugar === 'high' ? '220' : '110'}
+          </span>
+        </div>
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 w-24">
+            <Zap className="w-4 h-4 text-yellow-500" />
+            <span className="text-xs">{t.games.energy}</span>
+          </div>
+          <Progress 
+            value={getEnergyValue()} 
+            className="flex-1 h-3"
+          />
+          <span className={`text-xs font-medium w-12 text-center ${
+            currentLevelData?.energy === 'low' ? 'text-orange-500' : 'text-green-500'
+          }`}>
+            {currentLevelData?.energy === 'low' ? 'Low' : 'OK'}
+          </span>
+        </div>
+        <div className="text-center">
+          <span className={`text-sm font-medium px-3 py-1 rounded-full ${
+            currentLevelData?.bloodSugar === 'low' ? 'bg-orange-500/20 text-orange-600' :
+            currentLevelData?.bloodSugar === 'high' ? 'bg-red-500/20 text-red-600' :
+            currentLevelData?.energy === 'low' ? 'bg-yellow-500/20 text-yellow-600' :
+            'bg-green-500/20 text-green-600'
+          }`}>
+            {getStatusLabel()}
+          </span>
+        </div>
+      </div>
+
+      <div className="flex-1 relative overflow-hidden bg-gradient-to-b from-sky-400/20 via-sky-300/10 to-emerald-600/30">
+        <div className="absolute inset-0 flex items-center justify-center">
+          <div className="relative w-full max-w-xs h-full">
+            <div className="absolute left-1/2 -translate-x-1/2 bottom-0 w-16 h-full bg-gradient-to-t from-amber-800 to-amber-700 rounded-t-lg" />
+            
+            {[...Array(maxLevel)].map((_, i) => (
+              <motion.div
+                key={i}
+                className={`absolute left-1/2 -translate-x-1/2 w-32 h-8 rounded-full ${
+                  i < petPosition ? 'bg-emerald-600' : 'bg-emerald-700/80'
+                }`}
+                style={{ bottom: `${(i + 1) * 60 + 20}px` }}
+                initial={false}
+                animate={{ 
+                  scale: i === currentLevel && gameState === 'playing' ? [1, 1.02, 1] : 1,
+                }}
+                transition={{ repeat: i === currentLevel ? Infinity : 0, duration: 1.5 }}
+              />
+            ))}
+
+            <motion.div
+              className="absolute left-1/2 -translate-x-1/2 z-10"
+              style={{ bottom: 20 }}
+              animate={{
+                y: gameState === 'falling' ? 100 : -(petPosition * 60),
+                rotate: gameState === 'falling' ? 360 : 0,
+                scale: gameState === 'jumping' ? [1, 1.2, 1] : 1,
+              }}
+              transition={{ 
+                type: gameState === 'falling' ? 'tween' : 'spring',
+                duration: gameState === 'falling' ? 1 : 0.5,
+                damping: 15
+              }}
+            >
+              <div className="w-16 h-16 rounded-full bg-white shadow-lg flex items-center justify-center text-3xl border-4 border-blue-200">
+                <TreePine className="w-8 h-8 text-emerald-600" />
+              </div>
+            </motion.div>
+
+            <motion.div
+              className="absolute top-4 left-1/2 -translate-x-1/2"
+              animate={{ scale: [1, 1.1, 1] }}
+              transition={{ repeat: Infinity, duration: 2 }}
+            >
+              <TreePine className="w-20 h-20 text-emerald-500" />
+            </motion.div>
+          </div>
+        </div>
+      </div>
+
+      <div className="p-4 bg-gradient-to-t from-background to-transparent">
+        <p className="text-center text-sm text-muted-foreground mb-3">{t.games.whatToDo}</p>
+        <div className="grid grid-cols-3 gap-2">
+          {logOptions.map((option, index) => {
+            const Icon = actionIcons[option.action];
+            return (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.1 }}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+              >
+                <Button
+                  variant="outline"
+                  className="w-full h-20 flex flex-col items-center justify-center gap-1 rounded-xl bg-gradient-to-b from-amber-700/80 to-amber-800 border-amber-600 text-white hover:from-amber-600 hover:to-amber-700"
+                  onClick={() => handleLogClick(option.isCorrect)}
+                  disabled={gameState !== 'playing'}
+                  data-testid={`button-tree-${option.action}`}
+                >
+                  <motion.div
+                    animate={{ y: [0, -3, 0] }}
+                    transition={{ repeat: Infinity, duration: 1.5, delay: index * 0.2 }}
+                  >
+                    <Icon className="w-6 h-6" />
+                  </motion.div>
+                  <span className="text-xs font-medium text-center leading-tight">{actionLabels[option.action]}</span>
+                </Button>
+              </motion.div>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function ScenarioGame({ onBack }: { onBack: () => void }) {
   const { t, isRTL } = useLanguage();
   const scenarios = getScenarios(t);
@@ -620,7 +963,7 @@ function ScenarioGame({ onBack }: { onBack: () => void }) {
 
 export function GamesMenu({ isOpen, onClose, petId }: GamesMenuProps) {
   const { t, isRTL } = useLanguage();
-  const [activeGame, setActiveGame] = useState<'menu' | 'scenarios' | 'safetyRoutine'>('menu');
+  const [activeGame, setActiveGame] = useState<'menu' | 'scenarios' | 'safetyRoutine' | 'treeClimb'>('menu');
 
   const handleClose = () => {
     setActiveGame('menu');
@@ -707,6 +1050,31 @@ export function GamesMenu({ isOpen, onClose, petId }: GamesMenuProps) {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3 }}
             >
+              <Card 
+                className="p-5 cursor-pointer hover-elevate bg-gradient-to-br from-amber-500/10 to-lime-500/10 border-amber-500/20"
+                onClick={() => setActiveGame('treeClimb')}
+              >
+                <div className="flex items-center gap-4">
+                  <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-amber-600 to-lime-500 flex items-center justify-center shadow-lg">
+                    <TreePine className="w-7 h-7 text-white" />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="font-bold text-lg">{t.games.treeClimb}</h3>
+                    <p className="text-sm text-muted-foreground">{t.games.treeClimbDesc}</p>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <Coins className="w-4 h-4 text-yellow-500" />
+                    <span className="text-xs font-medium text-yellow-500">+10</span>
+                  </div>
+                </div>
+              </Card>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4 }}
+            >
               <Card className="p-5 opacity-60 bg-gradient-to-br from-green-500/10 to-teal-500/10 border-green-500/20">
                 <div className="flex items-center gap-4">
                   <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-green-500 to-teal-500 flex items-center justify-center shadow-lg">
@@ -773,6 +1141,8 @@ export function GamesMenu({ isOpen, onClose, petId }: GamesMenuProps) {
         <ScenarioGame onBack={() => setActiveGame('menu')} />
       ) : activeGame === 'safetyRoutine' ? (
         <SafetyRoutineGame onBack={() => setActiveGame('menu')} petId={petId} />
+      ) : activeGame === 'treeClimb' ? (
+        <TreeClimbGame onBack={() => setActiveGame('menu')} petId={petId} />
       ) : null}
     </motion.div>
   );
