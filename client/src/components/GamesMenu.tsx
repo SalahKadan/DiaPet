@@ -692,231 +692,198 @@ function TreeClimbGame({ onBack, petId }: { onBack: () => void; petId: number })
         className="flex-1 relative overflow-hidden"
         style={{ height: `${VIEWPORT_HEIGHT}px` }}
       >
-        <div className="absolute inset-0 bg-gradient-to-b from-sky-400/30 via-sky-300/20 to-emerald-700/40" />
+        <div className="absolute inset-0 bg-gradient-to-b from-sky-400 via-sky-300 to-green-600" />
+        
+        <div className="absolute top-0 left-0 w-20 h-32 bg-gradient-to-br from-green-700 to-green-800 rounded-br-[80px] opacity-90" />
+        <div className="absolute top-0 right-0 w-20 h-32 bg-gradient-to-bl from-green-700 to-green-800 rounded-bl-[80px] opacity-90" />
+        <div className="absolute top-8 left-6 w-16 h-24 bg-gradient-to-br from-green-600 to-green-700 rounded-br-[60px] opacity-80" />
+        <div className="absolute top-8 right-6 w-16 h-24 bg-gradient-to-bl from-green-600 to-green-700 rounded-bl-[60px] opacity-80" />
         
         <motion.div
-          className="absolute right-4 w-12 h-8 opacity-30"
-          style={{ top: '15%' }}
-          animate={{ x: [0, -60, 0], y: [0, 5, 0] }}
-          transition={{ repeat: Infinity, duration: 10, ease: "linear" }}
-        >
-          <div className="w-10 h-5 bg-white/70 rounded-full blur-sm" />
-        </motion.div>
-
-        <motion.div
-          className="absolute left-1/2 -translate-x-1/2 w-28"
-          style={{ 
-            height: worldHeight,
-            bottom: -worldHeight + VIEWPORT_HEIGHT,
-          }}
-          animate={{ y: worldScrollY }}
-          transition={{ type: "spring", damping: 22, stiffness: 90, delay: 0.3 }}
+          className="absolute left-1/2 -translate-x-1/2 bottom-0"
+          style={{ width: '55%', height: '100%' }}
+          animate={{ y: worldScrollY * 0.5 }}
+          transition={{ type: "spring", damping: 22, stiffness: 90, delay: 0.2 }}
         >
           <div
             className="absolute inset-0"
             style={{ 
-              background: 'linear-gradient(to top, #5d3a1a, #7a4a2a 20%, #6b4423 50%, #5d3a1a 80%, #4a2e15)',
-              borderRadius: '8px 8px 0 0'
+              background: 'linear-gradient(90deg, #4a3520 0%, #6b4c2a 15%, #8b6b3d 30%, #a67c4e 50%, #8b6b3d 70%, #6b4c2a 85%, #4a3520 100%)',
             }}
           >
-            {[...Array(Math.ceil(worldHeight / 50))].map((_, i) => (
+            {[...Array(20)].map((_, i) => (
               <div 
                 key={i}
-                className="absolute left-0 right-0 h-1 bg-amber-900/30"
-                style={{ bottom: `${i * 50}px` }}
+                className="absolute left-0 right-0"
+                style={{ 
+                  top: `${i * 5}%`,
+                  height: '2px',
+                  background: 'linear-gradient(90deg, transparent 0%, rgba(0,0,0,0.15) 20%, rgba(0,0,0,0.2) 50%, rgba(0,0,0,0.15) 80%, transparent 100%)'
+                }}
+              />
+            ))}
+            {[...Array(5)].map((_, i) => (
+              <div 
+                key={`v${i}`}
+                className="absolute top-0 bottom-0"
+                style={{ 
+                  left: `${15 + i * 18}%`,
+                  width: '3px',
+                  background: 'linear-gradient(180deg, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.2) 50%, rgba(0,0,0,0.1) 100%)'
+                }}
               />
             ))}
           </div>
         </motion.div>
 
-        <div className="absolute inset-0 flex flex-col items-center pointer-events-none">
-          <AnimatePresence mode="popLayout">
-            {gameState !== 'jumping' && (
-              <motion.div 
-                key={currentLevel}
-                className="absolute w-full flex justify-center pointer-events-auto"
-                style={{ bottom: logScreenY }}
-                initial={{ opacity: 0, y: -60 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: 100, scale: 0.8 }}
-                transition={{ type: "spring", damping: 20, stiffness: 180 }}
+        <div className="absolute left-0 top-[30%] w-[22%] h-6 bg-gradient-to-r from-amber-800 via-amber-700 to-amber-600 rounded-r-lg shadow-lg" style={{ boxShadow: '0 4px 8px rgba(0,0,0,0.3)' }}>
+          <div className="absolute inset-0 bg-gradient-to-b from-white/10 to-transparent rounded-r-lg" />
+        </div>
+        <div className="absolute right-0 top-[50%] w-[22%] h-6 bg-gradient-to-l from-amber-800 via-amber-700 to-amber-600 rounded-l-lg shadow-lg" style={{ boxShadow: '0 4px 8px rgba(0,0,0,0.3)' }}>
+          <div className="absolute inset-0 bg-gradient-to-b from-white/10 to-transparent rounded-l-lg" />
+        </div>
+        <div className="absolute left-0 top-[75%] w-[18%] h-5 bg-gradient-to-r from-amber-800 via-amber-700 to-amber-600 rounded-r-lg shadow-lg" style={{ boxShadow: '0 4px 8px rgba(0,0,0,0.3)' }}>
+          <div className="absolute inset-0 bg-gradient-to-b from-white/10 to-transparent rounded-r-lg" />
+        </div>
+
+        <motion.div
+          className="absolute left-1/2 -translate-x-1/2 z-20"
+          style={{ top: '22%', width: '75%' }}
+          animate={
+            gameState === 'falling' 
+              ? { y: [0, -30, 400], rotate: [0, -20, 360] }
+              : gameState === 'jumping'
+              ? { y: [-20, -60, -20] }
+              : { y: [0, -8, 0] }
+          }
+          transition={
+            gameState === 'falling'
+              ? { duration: 1.4, ease: [0.4, 0, 1, 1] }
+              : gameState === 'jumping'
+              ? { duration: 0.5, ease: "easeOut" }
+              : { repeat: Infinity, duration: 2 }
+          }
+        >
+          <div className="relative h-10 bg-gradient-to-r from-amber-800 via-amber-600 to-amber-800 rounded-lg shadow-xl" style={{ boxShadow: '0 6px 12px rgba(0,0,0,0.4)' }}>
+            <div className="absolute inset-0 bg-gradient-to-b from-white/20 to-transparent rounded-lg" />
+            <div className="absolute left-2 right-2 top-1/2 -translate-y-1/2 h-1 bg-amber-900/30 rounded-full" />
+            <div className="absolute -left-3 top-1/2 -translate-y-1/2 w-4 h-6 bg-amber-700 rounded-l-lg" />
+            <div className="absolute -right-3 top-1/2 -translate-y-1/2 w-4 h-6 bg-amber-700 rounded-r-lg" />
+          </div>
+          
+          <motion.div 
+            className="absolute -top-16 left-1/2 -translate-x-1/2"
+            animate={petControls}
+          >
+            <motion.div 
+              className="w-20 h-20 rounded-full bg-gradient-to-b from-white to-gray-100 shadow-2xl flex items-center justify-center border-4 border-orange-300"
+              animate={{
+                scale: gameState === 'jumping' ? [1, 1.1, 1] : 1,
+              }}
+            >
+              <Cat className="w-12 h-12 text-orange-400" />
+            </motion.div>
+            {gameState === 'jumping' && (
+              <motion.div
+                className="absolute -top-4 left-1/2 -translate-x-1/2 flex gap-1"
+                initial={{ opacity: 1, y: 0 }}
+                animate={{ opacity: 0, y: -20 }}
               >
-                {logOptions.map((option, optIndex) => {
-                  const Icon = actionIcons[option.action];
-                  const offsetX = (optIndex - 1) * 115;
-                  const isSelected = selectedLogIndex === optIndex;
-                  
-                  return (
-                    <motion.div
-                      key={`${currentLevel}-${optIndex}-${option.action}`}
-                      className="absolute"
-                      style={{
-                        left: '50%',
-                        x: offsetX,
-                        translateX: '-50%'
-                      }}
-                      initial={{ opacity: 0, scale: 0.5, y: -25 }}
-                      animate={{ 
-                        opacity: 1, 
-                        scale: 1,
-                        y: 0
-                      }}
-                      transition={{ 
-                        type: "spring",
-                        damping: 16,
-                        stiffness: 200,
-                        delay: optIndex * 0.08
-                      }}
-                    >
+                <Sparkles className="w-4 h-4 text-yellow-400" />
+                <Sparkles className="w-4 h-4 text-yellow-400" />
+              </motion.div>
+            )}
+            {gameState === 'falling' && (
+              <motion.div
+                className="absolute -top-6 left-1/2 -translate-x-1/2"
+                initial={{ opacity: 1 }}
+                animate={{ opacity: 0, y: -20 }}
+              >
+                <XCircle className="w-8 h-8 text-red-500" />
+              </motion.div>
+            )}
+          </motion.div>
+        </motion.div>
+
+        <AnimatePresence mode="popLayout">
+          {gameState !== 'jumping' && (
+            <motion.div 
+              key={currentLevel}
+              className="absolute left-1/2 -translate-x-1/2 z-10"
+              style={{ top: '52%', width: '90%' }}
+              initial={{ opacity: 0, y: -40 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 80 }}
+              transition={{ type: "spring", damping: 18, stiffness: 150 }}
+            >
+              <div className="relative h-20 bg-gradient-to-r from-amber-800 via-amber-600 to-amber-800 rounded-xl shadow-2xl" style={{ boxShadow: '0 8px 20px rgba(0,0,0,0.4)' }}>
+                <div className="absolute inset-0 bg-gradient-to-b from-white/15 to-transparent rounded-xl" />
+                <div className="absolute left-3 right-3 top-2 h-1 bg-amber-900/20 rounded-full" />
+                <div className="absolute left-3 right-3 bottom-2 h-1 bg-amber-900/20 rounded-full" />
+                <div className="absolute -left-4 top-1/2 -translate-y-1/2 w-5 h-10 bg-amber-700 rounded-l-lg shadow-lg" />
+                <div className="absolute -right-4 top-1/2 -translate-y-1/2 w-5 h-10 bg-amber-700 rounded-r-lg shadow-lg" />
+                
+                <div className="absolute inset-0 flex items-center justify-around px-6">
+                  {logOptions.map((option, optIndex) => {
+                    const Icon = actionIcons[option.action];
+                    const isSelected = selectedLogIndex === optIndex;
+                    
+                    return (
                       <motion.button
-                        className={`relative flex flex-col items-center justify-center w-28 h-20 rounded-xl shadow-xl border-3 ${
-                          isSelected
-                          ? 'bg-gradient-to-b from-green-500 to-green-700 border-green-400'
-                          : 'bg-gradient-to-b from-amber-500 to-amber-700 border-amber-400'
+                        key={`${currentLevel}-${optIndex}-${option.action}`}
+                        className={`flex flex-col items-center justify-center p-2 rounded-lg transition-colors ${
+                          isSelected ? 'bg-green-500/40' : 'bg-transparent'
                         }`}
                         onClick={() => handleLogClick(optIndex, option.isCorrect)}
                         disabled={gameState !== 'playing'}
-                        whileHover={gameState === 'playing' ? { scale: 1.1, y: -5 } : {}}
-                        whileTap={gameState === 'playing' ? { scale: 0.92 } : {}}
+                        whileHover={gameState === 'playing' ? { scale: 1.15, y: -5 } : {}}
+                        whileTap={gameState === 'playing' ? { scale: 0.9 } : {}}
                         data-testid={`button-tree-${option.action}`}
                       >
                         <motion.div
+                          className="p-2 bg-white/90 rounded-lg shadow-lg"
                           animate={gameState === 'playing' ? { 
-                            y: [0, -5, 0],
-                            rotate: [0, -8, 8, 0]
+                            y: [0, -3, 0],
                           } : {}}
                           transition={{ 
                             repeat: Infinity, 
-                            duration: 1.8,
-                            delay: optIndex * 0.25
+                            duration: 1.5,
+                            delay: optIndex * 0.2
                           }}
                         >
-                          <Icon className="w-8 h-8 text-white drop-shadow-lg" />
+                          <Icon className="w-7 h-7 text-amber-700" />
                         </motion.div>
-                        <span className="text-[10px] font-bold text-white mt-1.5 drop-shadow-md text-center leading-tight px-1">
+                        <span className="text-[10px] font-bold text-white mt-1 drop-shadow-lg text-center leading-tight max-w-[70px]">
                           {actionLabels[option.action]}
                         </span>
-                        
-                        <div className="absolute -left-3 top-1/2 -translate-y-1/2 w-3 h-4 bg-amber-800 rounded-l-sm" />
-                        <div className="absolute -right-3 top-1/2 -translate-y-1/2 w-3 h-4 bg-amber-800 rounded-r-sm" />
                       </motion.button>
-                    </motion.div>
-                  );
-                })}
-              </motion.div>
-            )}
-          </AnimatePresence>
-
-          <motion.div
-            className="absolute z-30"
-            style={{
-              left: '50%',
-              translateX: '-50%',
-              bottom: PET_BASELINE
-            }}
-            animate={
-              gameState === 'falling' 
-                ? {
-                    y: [0, -50, 500],
-                    rotate: [0, -30, 540],
-                    scale: 1,
-                  }
-                : gameState === 'playing'
-                ? {
-                    y: [0, -6, 0],
-                    rotate: 0,
-                    scale: 1,
-                  }
-                : undefined
-            }
-            transition={
-              gameState === 'falling'
-                ? {
-                    y: { type: 'tween', duration: 1.4, ease: [0.4, 0, 1, 1] },
-                    rotate: { duration: 1.4 },
-                  }
-                : gameState === 'playing'
-                ? {
-                    y: { repeat: Infinity, duration: 2 },
-                  }
-                : undefined
-            }
-          >
-            <motion.div
-              animate={petControls}
-              className="relative"
-            >
-              <motion.div 
-                className="w-18 h-18 rounded-full bg-white shadow-2xl flex items-center justify-center border-4 border-blue-300"
-                style={{ width: '72px', height: '72px' }}
-                animate={{
-                  boxShadow: gameState === 'jumping' 
-                    ? ['0 4px 15px rgba(0,0,0,0.2)', '0 30px 60px rgba(0,0,0,0.4)', '0 10px 25px rgba(0,0,0,0.25)']
-                    : '0 4px 15px rgba(0,0,0,0.2)'
-                }}
-              >
-                <Cat className="w-10 h-10 text-gray-600" />
-              </motion.div>
-              
-              {gameState === 'jumping' && (
-                <>
-                  <motion.div
-                    className="absolute -bottom-3 left-1/2 -translate-x-1/2 w-10 h-3 bg-black/25 rounded-full blur-md"
-                    initial={{ scale: 1, opacity: 0.6 }}
-                    animate={{ scale: 0.15, opacity: 0 }}
-                    transition={{ duration: 0.4 }}
-                  />
-                  {[...Array(8)].map((_, i) => (
-                    <motion.div
-                      key={i}
-                      className="absolute w-2 h-2 bg-yellow-300 rounded-full"
-                      style={{ left: '50%', top: '50%' }}
-                      initial={{ x: 0, y: 0, opacity: 1, scale: 1 }}
-                      animate={{ 
-                        x: Math.cos((i / 8) * Math.PI * 2) * 45, 
-                        y: Math.sin((i / 8) * Math.PI * 2) * 45,
-                        opacity: 0,
-                        scale: 0
-                      }}
-                      transition={{ duration: 0.55, delay: i * 0.03 }}
-                    />
-                  ))}
-                </>
-              )}
-              
-              {gameState === 'falling' && (
-                <motion.div
-                  className="absolute -top-5 left-1/2 -translate-x-1/2"
-                  initial={{ opacity: 1, y: 0, scale: 1 }}
-                  animate={{ opacity: 0, y: -25, scale: 1.5 }}
-                  transition={{ duration: 0.6 }}
-                >
-                  <XCircle className="w-7 h-7 text-red-500" />
-                </motion.div>
-              )}
+                    );
+                  })}
+                </div>
+              </div>
             </motion.div>
-          </motion.div>
-        </div>
+          )}
+        </AnimatePresence>
 
-        <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex items-center gap-1.5 bg-black/30 px-3 py-1.5 rounded-full backdrop-blur-sm z-10">
+        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-2 bg-black/40 px-4 py-2 rounded-full backdrop-blur-sm z-30">
           {[...Array(maxLevel)].map((_, i) => (
             <motion.div
               key={i}
-              className={`w-2.5 h-2.5 rounded-full ${
+              className={`w-3 h-3 rounded-full ${
                 i < currentLevel 
                   ? 'bg-green-400' 
                   : i === currentLevel 
                   ? 'bg-yellow-400' 
                   : 'bg-white/30'
               }`}
-              animate={i === currentLevel ? { scale: [1, 1.4, 1] } : {}}
+              animate={i === currentLevel ? { scale: [1, 1.3, 1] } : {}}
               transition={{ repeat: Infinity, duration: 1 }}
             />
           ))}
         </div>
 
         <motion.div 
-          className="absolute top-2 left-1/2 -translate-x-1/2 text-[10px] font-bold text-white bg-black/35 px-2.5 py-1 rounded-full z-10"
+          className="absolute top-3 left-1/2 -translate-x-1/2 text-xs font-bold text-white bg-black/50 px-4 py-1.5 rounded-full z-30"
           key={currentLevel}
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
