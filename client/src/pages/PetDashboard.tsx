@@ -322,8 +322,8 @@ export function PetDashboard({ pet }: PetDashboardProps) {
   const experiencePercent = pet.experience || 0;
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-background overflow-hidden p-4" dir={isRTL ? 'rtl' : 'ltr'}>
-      <div className="relative w-full max-w-[450px] aspect-[9/19] bg-card rounded-[3rem] shadow-2xl overflow-hidden flex flex-col border border-white/5">
+    <div className="fixed inset-0 flex items-center justify-center bg-background overflow-hidden px-4 py-6" dir={isRTL ? 'rtl' : 'ltr'}>
+      <div className="relative w-full max-w-[450px] h-full bg-card rounded-[3rem] shadow-2xl overflow-hidden flex flex-col border border-white/5">
         
         <AnimatePresence>
           {namingOpen && (

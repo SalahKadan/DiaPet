@@ -64,14 +64,14 @@ export default function Settings() {
 
   return (
     <motion.div 
-      className="fixed inset-0 flex items-center justify-center bg-background overflow-hidden p-4"
+      className="fixed inset-0 flex items-center justify-center bg-background overflow-hidden px-4 py-6"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.3 }}
       dir={isRTL ? 'rtl' : 'ltr'}
     >
       <motion.div 
-        className="relative w-full max-w-[450px] aspect-[9/19] bg-card rounded-[3rem] shadow-2xl overflow-hidden flex flex-col border border-white/5"
+        className="relative w-full max-w-[450px] h-full bg-card rounded-[3rem] shadow-2xl overflow-hidden flex flex-col border border-white/5"
         initial={{ scale: 0.95, y: 20 }}
         animate={{ scale: 1, y: 0 }}
         transition={{ duration: 0.3, ease: "easeOut" }}

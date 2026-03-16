@@ -200,10 +200,10 @@ export function Shop({ pet, onClose }: ShopProps) {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 z-50 bg-background flex items-center justify-center p-4"
+      className="fixed inset-0 z-50 bg-background flex items-center justify-center px-4 py-6"
       dir={isRTL ? 'rtl' : 'ltr'}
     >
-      <div className="relative w-full max-w-[450px] aspect-[9/19] bg-card rounded-[3rem] shadow-2xl overflow-hidden flex flex-col border border-white/5">
+      <div className="relative w-full max-w-[450px] h-full bg-card rounded-[3rem] shadow-2xl overflow-hidden flex flex-col border border-white/5">
         <div className="p-6 flex items-center justify-between border-b border-border/50">
           <Button
             variant="ghost"
