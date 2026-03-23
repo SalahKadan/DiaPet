@@ -1,0 +1,95 @@
+
+> rest-express@1.0.0 dev
+> NODE_ENV=development tsx server/index.ts
+
+[1G[0K1:22:07 PM [express] serving on port 5000
+1:22:16 PM [express] GET /api/auth/user 401 in 3ms :: {"message":"Unauthorized"}
+1:22:16 PM [express] GET /api/pets 200 in 17ms :: [{"id":3,"userId":"demo_id","name":"Pet","type":"dragon","health":90,"hunger":50,"energy":4,"bloodSugar":142,"insulinLevel":500,"mood":"happy","isAsleep":false,"level":10,"experience":215,"coins":70,"activeScenario":"tired","scenarioDescription":"Your buddy stayed up way too late! They're exhausted and their body isn't working well. They need rest or a snack!","lastChallengeAt":"2026-03-16T13:19:52.932Z","lastFed":"2026-03-16T13:15:34.892Z","lastInsulin":"2026-01-04T16:33:41.216Z","lastBloodTest":"2026-03-16T13:17:03.507Z","createdAt":"2025-12-31T00:22:51.373Z"}]
+1:22:41 PM [express] POST /api/pets/3/auto-heal 200 in 30ms :: {"healed":false,"challengeCompleted":false,"leveledUp":false,"pet":{"id":3,"userId":"demo_id","name":"Pet","type":"dragon","health":90,"hunger":50,"energy":4,"bloodSugar":142,"insulinLevel":500,"mood":"happy","isAsleep":false,"level":10,"experience":215,"coins":70,"activeScenario":"tired","scenarioDescription":"Your buddy stayed up way too late! They're exhausted and their body isn't working well. They need rest or a snack!","lastChallengeAt":"2026-03-16T13:19:52.932Z","lastFed":"2026-03-16T13:15:34.892Z","lastInsulin":"2026-01-04T16:33:41.216Z","lastBloodTest":"2026-03-16T13:17:03.507Z","createdAt":"2025-12-31T00:22:51.373Z"}}
+1:22:41 PM [express] POST /api/pets/3/tick 200 in 35ms :: {"id":3,"userId":"demo_id","name":"Pet","type":"dragon","health":90,"hunger":48,"energy":2,"bloodSugar":142,"insulinLevel":500,"mood":"happy","isAsleep":false,"level":10,"experience":215,"coins":70,"activeScenario":"tired","scenarioDescription":"Your buddy stayed up way too late! They're exhausted and their body isn't working well. They need rest or a snack!","lastChallengeAt":"2026-03-16T13:19:52.932Z","lastFed":"2026-03-16T13:15:34.892Z","lastInsulin":"2026-01-04T16:33:41.216Z","lastBloodTest":"2026-03-16T13:17:03.507Z","createdAt":"2025-12-31T00:22:51.373Z"}
+1:22:42 PM [express] GET /api/pets 200 in 10ms :: [{"id":3,"userId":"demo_id","name":"Pet","type":"dragon","health":90,"hunger":48,"energy":2,"bloodSugar":142,"insulinLevel":500,"mood":"happy","isAsleep":false,"level":10,"experience":215,"coins":70,"activeScenario":"tired","scenarioDescription":"Your buddy stayed up way too late! They're exhausted and their body isn't working well. They need rest or a snack!","lastChallengeAt":"2026-03-16T13:19:52.932Z","lastFed":"2026-03-16T13:15:34.892Z","lastInsulin":"2026-01-04T16:33:41.216Z","lastBloodTest":"2026-03-16T13:17:03.507Z","createdAt":"2025-12-31T00:22:51.373Z"}]
+1:22:42 PM [express] GET /api/pets/3/equipped-items 304 in 7ms :: []
+1:22:42 PM [express] GET /api/pets/3/owned-items 304 in 20ms :: [{"id":4,"petId":3,"itemId":"sweater","equipped":false,"purchasedAt":"2026-01-03T19:24:42.340Z"},{"id":2,"petId":3,"itemId":"collar","equipped":false,"purchasedAt":"2026-01-02T20:24:02.559Z"},{"id":1,"petId":3,"itemId":"bowtie","equipped":false,"purchasedAt":"2026-01-02T19:52:09.987Z"},{"id":3,"petId":3,"itemId":"glasses","equipped":false,"purchasedAt":"2026-01-02T21:49:49.156Z"}]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+[1;1H[0J[2m1:23:03 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/PetDashboard.tsx, /src/index.css[22m
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+[1;1H[0J[2m1:23:12 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/index.css, /src/pages/Shop.tsx[22m
